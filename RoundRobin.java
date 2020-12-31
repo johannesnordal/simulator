@@ -1,4 +1,4 @@
-public class RoundRobin {
+public class RoundRobin extends Dispatcher {
     private Scheduler[] scheduler;
     private int i = 0;
     

@@ -1,16 +1,18 @@
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 
-public abstract class Scheduler {
+public abstract class Scheduler implements EventSource<Client> {
 
     public abstract void step(double nextStep);    
     public abstract void schedule(Client incoming);
-    public abstract int active();
     public abstract double work();
+    public abstract int active();
 
-    private ArrayList<Observer> observer;
+    private ArrayDeque<Observer<Client>> arrivalObserver;
+    private ArrayDeque<Observer<Client>> departureObserver;
 
     public Scheduler() {
-        observer = new ArrayList<Observer>();
+        arrivalObserver = new ArrayDeque<Observer<Client>>();
+        departureObserver = new ArrayDeque<Observer<Client>>();
     }
 
     public void receive(Client incoming) {
@@ -18,19 +20,20 @@ public abstract class Scheduler {
         schedule(incoming);
     }
 
-    public void observer(Observer observer) {
-        this.observer.add(observer);
+    public void registerObserver(Observer<Client> observer) {
+        if (observer.isObserving(Event.ARRIVAL))
+            arrivalObserver.add(observer);
+        if (observer.isObserving(Event.DEPARTURE))
+            departureObserver.add(observer);
     }
 
-    public void registerArrival(Client client) {
-        for (Observer s : observer) {
-            s.arriving(client);
-        }
-    }
-
-    public void registerDeparture(Client client) {
-        for (Observer s : observer) {
-            s.departing(client);
+    public void registerEvent(Event event, Client client) {
+        if (event == Event.ARRIVAL) {
+            for (Observer<Client> x : arrivalObserver)
+                x.update(event, client);
+        } else if (event == Event.DEPARTURE) {
+            for (Observer<Client> x : departureObserver)
+                x.update(event, client);
         }
     }
 }

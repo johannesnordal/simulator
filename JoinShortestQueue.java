@@ -1,7 +1,7 @@
 import java.util.Random;
 import java.util.ArrayList;
 
-public class JoinShortestQueue {
+public class JoinShortestQueue extends Dispatcher {
     private Scheduler[] scheduler;
     private Random random;
 
@@ -12,18 +12,18 @@ public class JoinShortestQueue {
 
     public void dispatch(Client incoming) {
         scheduler[0].step(incoming.arrival());
-        int min = scheduler[0].size();
+        int min = scheduler[0].active();
         int j = 0;
         for (int i = 1; i < scheduler.length; i++) {
             scheduler[i].step(incoming.arrival()); 
-            if (scheduler[i].size() < min) {
-                min = scheduler[i].size();
+            if (scheduler[i].active() < min) {
+                min = scheduler[i].active();
                 j = i;
             }
         }
         ArrayList<Integer> x = new ArrayList<Integer>(scheduler.length);
         for (int i = 0; i < scheduler.length; i++)
-            if (scheduler[i].size() == min) x.add(i);
+            if (scheduler[i].active() == min) x.add(i);
         int i = random.nextInt(x.size());
         scheduler[x.get(i)].schedule(incoming);
     }

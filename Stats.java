@@ -1,6 +1,5 @@
-public class Stats implements Observer {
+public class Stats implements Observer<Client> {
     private Moment interarrival;
-    private double lastArrival;
     private Moment service;
     private Moment waiting;
     private Moment departure;
@@ -18,6 +17,7 @@ public class Stats implements Observer {
         slowdown = new Moment();
     }
 
+    private double lastArrival;
     public void interarrival(Client x) {
         interarrival.accum(x.arrival() - lastArrival);
         lastArrival = x.arrival();
@@ -41,14 +41,6 @@ public class Stats implements Observer {
 
     public void slowdown(Client x) {
         slowdown.accum(x.slowdown());
-    }
-
-    public void registerArrival() {
-        arrivals += 1;
-    }
-
-    public void registerDeparture() {
-        departures += 1;
     }
 
     public Moment interarrival() {
@@ -83,17 +75,30 @@ public class Stats implements Observer {
         return departures;
     }
 
-    public void arriving(Client client) {
-        interarrival(client);
-        registerArrival();
+    public void update(Event event, Client client) {
+        if (event == Event.ARRIVAL)
+            registerArrival(client);
+        else if (event == Event.DEPARTURE)
+            registerDeparture(client);
     }
 
-    public void departing(Client client) {
+    public boolean isObserving(Event event) {
+        if (event == Event.ARRIVAL) return true;
+        if (event == Event.DEPARTURE) return true;
+        return false;
+    }
+
+    private void registerArrival(Client client) {
+        interarrival(client);
+        arrivals++;
+    }
+
+    private void registerDeparture(Client client) {
         service(client);
         waiting(client);
         response(client);
         slowdown(client);
         departure(client);
-        registerDeparture();
+        departures++;
     }
 }

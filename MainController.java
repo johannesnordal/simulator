@@ -5,17 +5,17 @@ public class MainController {
         Scheduler[] scheduler = new Scheduler[n];
         Stats[] stats = new Stats[n];
         for (int i = 0; i < n; i++) {
-            scheduler[i] = new FirstComeFirstServe();
+            scheduler[i] = new ShortestJobFirst();
             stats[i] = new Stats();
-            scheduler[i].observer(stats[i]);
+            scheduler[i].registerObserver(stats[i]);
         }
-        LeastWorkLeft lwl = new LeastWorkLeft(scheduler);
+        Dispatcher dispatcher = new LeastWorkLeft(scheduler);
         Distribution X = new Exponential(2.0);
         Distribution Y = new Exponential(n);
         double clock = 0.0;
         for (int i = 0; i < clients; i++) {
             clock += Y.draw();
-            lwl.dispatch(new Client(clock, X.draw()));
+            dispatcher.dispatch(new Client(clock, X.draw()));
         }
         for (int i = 0; i < n; i++) {
             System.out.println(stats[i].response().first());

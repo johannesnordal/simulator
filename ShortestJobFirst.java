@@ -2,6 +2,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class ShortestJobFirst extends Scheduler {
+
     private Comparator<Client> cmp;
     private PriorityQueue<Client> pq;
     private Server server;
@@ -17,7 +18,7 @@ public class ShortestJobFirst extends Scheduler {
     }
 
     public void schedule(Client incoming) {
-        registerArrival(incoming);
+        registerEvent(Event.ARRIVAL, incoming);
         if (server.running() == null) {
             server.running(incoming);
         }
@@ -35,7 +36,7 @@ public class ShortestJobFirst extends Scheduler {
 
     private void swap() {
         Client running = server.running();
-        registerDeparture(running);
+        registerEvent(Event.DEPARTURE, running);
         if (pq.isEmpty()) {
             server.running(null);
             return;

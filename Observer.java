@@ -1,4 +1,4 @@
-public interface Observer {
-    public void arriving(Client client);
-    public void departing(Client client);
+public interface Observer<T> {
+    public void update(Event event, T type);
+    public boolean isObserving(Event event);
 }

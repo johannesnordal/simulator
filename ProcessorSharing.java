@@ -20,7 +20,7 @@ public class ProcessorSharing extends Scheduler {
     }
 
     public void schedule(Client incoming) {
-        registerArrival(incoming);
+        registerEvent(Event.ARRIVAL, incoming);
         pq.add(incoming);
     }
 
@@ -37,7 +37,7 @@ public class ProcessorSharing extends Scheduler {
         if (pq.size() == 0) return;
         double interStep = interStep(nextStep);
         while (interStep < nextStep) {
-            registerDeparture(pq.remove());
+            registerEvent(Event.DEPARTURE, pq.remove());
             server.speed(speed * (1.0/(pq.size() + 1)));
             for (Client running : pq) {
                 server.running(running);
@@ -75,7 +75,7 @@ public class ProcessorSharing extends Scheduler {
         Stats stats = new Stats();
         ProcessorSharing scheduler = new ProcessorSharing();
         // scheduler.speed(3.0);
-        scheduler.observer(stats);
+        scheduler.registerObserver(stats);
         double clock = 0.0;
         scheduler.schedule(new Client(clock, X.draw(), 0));
         for (int i = 1; i <= 10000000; i++) {

@@ -11,7 +11,7 @@ public class LastComeFirstServe extends Scheduler {
     }
 
     public void schedule(Client incoming) {
-        registerArrival(incoming);
+        registerEvent(Event.ARRIVAL, incoming);
         if (server.running() == null) {
             server.running(incoming);
         } else {
@@ -31,7 +31,7 @@ public class LastComeFirstServe extends Scheduler {
 
     private void swap() {
         Client running = server.running();
-        registerDeparture(running);
+        registerEvent(Event.DEPARTURE, running);
         if (stack.isEmpty()) {
             server.running(null);
             return;
@@ -55,21 +55,5 @@ public class LastComeFirstServe extends Scheduler {
     public int active() {
         if (server.running() == null) return 0;
         return stack.size() + 1;
-    }
-
-    public static void main(String[] args) {
-        int n = 100000000;
-        Distribution X = new Exponential(3.0);
-        Distribution Y = new Exponential(1.0);
-        Stats stats = new Stats();
-        Scheduler scheduler = new LastComeFirstServe();
-        scheduler.observer(stats);
-        double clock = 0.0;
-        for (int i = 0; i < n; i++) {
-            clock += Y.draw();
-            scheduler.step(clock);
-            scheduler.schedule(new Client(clock, X.draw()));
-        }
-        System.out.println(stats.response().first());
     }
 }

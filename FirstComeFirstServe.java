@@ -20,7 +20,7 @@ public class FirstComeFirstServe extends Scheduler {
     }
 
     public void schedule(Client incoming) {
-        registerArrival(incoming);
+        registerEvent(Event.ARRIVAL, incoming);
         if (server.running() == null)
             server.running(incoming);
         else
@@ -28,7 +28,7 @@ public class FirstComeFirstServe extends Scheduler {
     }
 
     public void step(double nextStep) {
-        var slice = server.slice(nextStep);
+        double slice = server.slice(nextStep);
         while (slice > 0.0) {
             server.step(slice);
             if (!server.isBusy())
@@ -39,12 +39,12 @@ public class FirstComeFirstServe extends Scheduler {
 
     private void swap(Client next) {
         Client running = server.running();
-        registerDeparture(running);
+        registerEvent(Event.DEPARTURE, running);
         if (next == null) {
             server.running(null);
             return;
         }
-        var wait = running.departure() - next.step();
+        double wait = running.departure() - next.step();
         next.step(wait);
         // next.waiting(wait);
         server.running(next);
@@ -67,7 +67,7 @@ public class FirstComeFirstServe extends Scheduler {
         Distribution Y = new Exponential(1.0);
         Stats stats = new Stats();
         Scheduler scheduler = new FirstComeFirstServe();
-        scheduler.observer(stats);
+        scheduler.registerObserver(stats);
         double clock = 0.0;
         for (int i = 0; i < n; i++) {
             clock += Y.draw();

@@ -1,7 +1,7 @@
 import java.util.Random;
 import java.util.ArrayList;
 
-public class LeastWorkLeft {
+public class LeastWorkLeft extends Dispatcher {
     private Scheduler[] scheduler;
 
     public LeastWorkLeft(Scheduler[] scheduler) {
@@ -9,16 +9,16 @@ public class LeastWorkLeft {
     }
 
     public void dispatch(Client incoming) {
-        ArrayList<Integer> x = new ArrayList<Integer>(scheduler.length);
+        registerEvent(Event.ARRIVAL, incoming);
+        ArrayList<Integer> x = new ArrayList<>(scheduler.length);
         double min = Double.MAX_VALUE;
         for (int i = 0; i < scheduler.length; i++) {
             scheduler[i].step(incoming.arrival());
             double work = scheduler[i].work();
-            if (work == min)
-                x.add(i);
+            if (work == min) x.add(i);
             if (work < min) {
                 min = work;
-                x = new ArrayList<Integer>(scheduler.length);
+                x = new ArrayList<>(scheduler.length);
                 x.add(i);
             }
         }

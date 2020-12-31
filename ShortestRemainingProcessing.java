@@ -17,7 +17,7 @@ public class ShortestRemainingProcessing extends Scheduler {
     }
 
     public void schedule(Client incoming) {
-        registerArrival(incoming);
+        registerEvent(Event.ARRIVAL, incoming);
         pq.offer(incoming);
         server.running(pq.peek());
     }
@@ -33,7 +33,7 @@ public class ShortestRemainingProcessing extends Scheduler {
 
     private void swap() {
         Client running = pq.remove();
-        registerDeparture(running);
+        registerEvent(Event.DEPARTURE, running);
         if (pq.isEmpty()) {
             server.running(null);
             return;
