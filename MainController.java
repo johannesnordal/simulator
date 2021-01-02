@@ -1,22 +1,27 @@
+import org.apache.commons.math3.distribution.*;
+
 public class MainController {
     public static void main(String[] args) {
+        double shape = WeibullUtils.fitShapeToCoefficientOfVariation(1.5);
+        double scale = WeibullUtils.fitScaleToShape(0.6, shape);
         int n = Integer.parseInt(args[0]);
-        int clients = Integer.parseInt(args[1]);
-        Scheduler[] scheduler = new Scheduler[n];
+        int m = Integer.parseInt(args[1]);
+        RealDistribution arrival = new ExponentialDistribution(1.0);
+        RealDistribution service = new ExponentialDistribution(0.5);
+        double[] interval = SizeIntervalTaskAssignment.split(n, service);
         Stats[] stats = new Stats[n];
+        Scheduler[] scheduler = FirstComeFirstServe.arrayOf(n);
         for (int i = 0; i < n; i++) {
-            scheduler[i] = new ShortestJobFirst();
             stats[i] = new Stats();
             scheduler[i].registerObserver(stats[i]);
         }
-        Dispatcher dispatcher = new LeastWorkLeft(scheduler);
-        Distribution X = new Exponential(2.0);
-        Distribution Y = new Exponential(n);
-        double clock = 0.0;
-        for (int i = 0; i < clients; i++) {
-            clock += Y.draw();
-            dispatcher.dispatch(new Client(clock, X.draw()));
+        Dispatcher dispatcher = new SizeIntervalTaskAssignment(scheduler, interval);
+        ClientFactory client = new ClientFactory(arrival, service, m);
+        while (client.hasNext()) {
+            dispatcher.dispatch(client.next());
         }
+        for (double x : interval) System.out.println(x);
+        System.out.println();
         for (int i = 0; i < n; i++) {
             System.out.println(stats[i].response().first());
         }

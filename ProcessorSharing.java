@@ -68,21 +68,4 @@ public class ProcessorSharing extends Scheduler {
     public void speed(double speed) {
         this.speed = speed;
     }
-
-    public static void main(String[] args) {
-        Distribution X = new Exponential(2.0);
-        Distribution Y = new Exponential(1.0);
-        Stats stats = new Stats();
-        ProcessorSharing scheduler = new ProcessorSharing();
-        // scheduler.speed(3.0);
-        scheduler.registerObserver(stats);
-        double clock = 0.0;
-        scheduler.schedule(new Client(clock, X.draw(), 0));
-        for (int i = 1; i <= 10000000; i++) {
-            clock += Y.draw();
-            scheduler.step(clock);
-            scheduler.schedule(new Client(clock, X.draw(), i));
-        }
-        System.out.println(stats.response().first());
-    }
 }

@@ -23,6 +23,7 @@ public class Client {
         this.id = id;
     }
 
+    /*
     public static Client[] batch(Distribution service, double arrival, int n) {
         Client[] batch = new Client[n];
         for (int i = 0; i < n; i++) {
@@ -30,6 +31,7 @@ public class Client {
         }
         return batch;
     }
+    */
 
     public void step(double slice) {
         step += (slice < 0 ? 0.0 : slice);
@@ -90,22 +92,5 @@ public class Client {
 
     public int id() {
         return id;
-    }
-
-    public static void main(String[] args) {
-        Client client = new Client(0.2, 1.3);
-
-        client.id(1);
-        client.step(0.3);
-        client.status(0.2);
-        // client.waiting(0.1);
-
-        System.out.println("step:\t\t" + client.step());
-        System.out.println("status:\t\t" + client.status());
-        System.out.println("arrival:\t" + client.arrival());
-        System.out.println("service:\t" + client.service());
-        System.out.println("waiting:\t" + client.waiting());
-        System.out.println("departure:\t" + client.departure());
-        System.out.println("id:\t\t" + client.id());
     }
 }

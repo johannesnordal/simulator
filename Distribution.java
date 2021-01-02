@@ -1,24 +1,32 @@
+import static java.lang.Math.pow;
 import java.util.Random;
-import static java.lang.Math.*;
 
 public abstract class Distribution {
     protected Random rnd;
+    protected long seed;
+
+    public abstract double sample();
+    public abstract double density(double x);
+    protected abstract double mgf(int m);
 
     public Distribution() {
         rnd = new Random();
     }
 
-    public Distribution setSeed(long seed) {
+    public Distribution seed(long seed) {
         rnd.setSeed(seed);
         return this;
     }
 
-    protected int fact(int n) {
-        if (n == 0) 
-            return 1;
-        else
-            return n * fact(n-1);
+    public long seed() {
+        return seed;
     }
 
-    public abstract double draw();
+    public double getNumericalMean() {
+        return mgf(1);
+    }
+
+    public double getNumericalVariance() {
+        return mgf(2) - pow(mgf(1), 2);
+    }
 }

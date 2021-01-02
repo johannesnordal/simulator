@@ -60,21 +60,4 @@ public class FirstComeFirstServe extends Scheduler {
         for (Client x : pq) work += x.status();
         return work;
     }
-
-    public static void main(String[] args) {
-        int n = Integer.parseInt(args[0]);
-        Distribution X = new Exponential(2.0);
-        Distribution Y = new Exponential(1.0);
-        Stats stats = new Stats();
-        Scheduler scheduler = new FirstComeFirstServe();
-        scheduler.registerObserver(stats);
-        double clock = 0.0;
-        for (int i = 0; i < n; i++) {
-            clock += Y.draw();
-            scheduler.step(clock);
-            scheduler.schedule(new Client(clock, X.draw()));
-        }
-        System.out.println(stats.waiting().first());
-        System.out.println(stats.response().first());
-    }
 }

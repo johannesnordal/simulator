@@ -40,23 +40,4 @@ public class Server {
     public double speed() {
         return speed;
     }
-
-    public static void main(String[] args) {
-        Server s1 = new Server();
-        Server s2 = new Server();
-
-        s1.running(new Client(0.0, 2.0));
-        s2.running(new Client(1.0, 3.0));
-        
-        double slice1 = s1.slice(1.5);
-        double slice2 = s2.slice(1.5);
-        System.out.println(slice1);
-        System.out.println(slice2);
-        System.out.println(s1.running().step());
-        System.out.println(s2.running().step());
-        s1.step(slice1);
-        s2.step(slice2);
-        System.out.println(s1.running().step());
-        System.out.println(s2.running().step());
-    }
 }
