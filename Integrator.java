@@ -24,18 +24,17 @@ public class Integrator {
     }
 
     public static void main(String[] args) { 
-        double shape = WeibullUtils.fitShapeToCoefficientOfVariation(0.5);
-        double scale = WeibullUtils.fitScaleToMeanAndShape(0.6, shape);
-        Distribution service = new Weibull(scale, shape);
-        DoubleUnaryOperator f = x -> {
-            return x * service.density(x);
-        };
-        Integrator integrator = new Integrator(f);
-        DoubleUnaryOperator g = x -> {
-            return integrator.integrate(0, x) - service.getNumericalMean()/2.0;
-        };
-        Bracket bracket = new Bracket(g);
-        System.out.println(bracket.lower());
-        System.out.println(bracket.upper());
+        Distribution d1 = new Exponential(0.6);
+        Distribution d2 = new Weibull(0.68, 2.1);
+        Distribution d3 = new Uniform(1.0, 4.0);
+        System.out.println(d1.getNumericalMean());
+        System.out.println(d2.getNumericalMean());
+        System.out.println(d3.getNumericalMean());
+        Integrator i1 = new Integrator(x -> x * d1.density(x));
+        Integrator i2 = new Integrator(x -> x * d2.density(x));
+        Integrator i3 = new Integrator(x -> x * d3.density(x));
+        System.out.println(i1.integrate(0.0, 50));
+        System.out.println(i2.integrate(0.0, 50));
+        System.out.println(i3.integrate(1.0, 4.0));
     }
 }

@@ -1,33 +1,26 @@
-import java.util.OptionalDouble;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.DoublePredicate;
 import java.util.OptionalDouble;
 import static java.lang.Math.abs;
 
 public class Bracket {
-    private final int MAX_ITER = 1000;
+    private final int MAX_ITER = 10000;
     private DoubleUnaryOperator fn;
     private OptionalDouble lower;
     private OptionalDouble upper;
 
     public Bracket(DoubleUnaryOperator fn) {
         this.fn = fn;
-        lower = calculateBound(x -> x <= 0, 1.0);
-        upper = calculateBound(x -> x >= 0, 1.0); 
+        lower = calculateBound(x -> x <= 0);
+        upper = calculateBound(x -> x >= 0); 
     }
 
-    public Bracket(DoubleUnaryOperator fn, double target) {
-        this.fn = fn;
-        lower = calculateBound(x -> x <= target, target);
-        upper = calculateBound(x -> x >= target, target); 
-    }
-
-    private OptionalDouble calculateBound(DoublePredicate p, double target) {
+    private OptionalDouble calculateBound(DoublePredicate p) {
         DoubleUnaryOperator[] parameters = {
-            x ->  x/target, x ->  target/x,
-            x -> -x/target, x -> -target/x
+            x ->  x/1.0, x ->  1.0/x,
+            x -> -x/1.0, x -> -1.0/x
         };
-        for (int i = 1; i <= MAX_ITER; i++) {
+        for (int i = 1; i <= MAX_ITER; i += 10) {
             for (DoubleUnaryOperator param : parameters) {
                 double x = param.applyAsDouble(i);
                 if (p.test(fn.applyAsDouble(x)))
@@ -50,14 +43,11 @@ public class Bracket {
     }
 
     public static void main(String[] args) {
-        double shape = WeibullUtils.fitShapeToCoefficientOfVariation(0.5);
-        double scale = WeibullUtils.fitScaleToMeanAndShape(0.6, shape);
-        Distribution service = new Weibull(scale, shape);
-        int i = Integer.parseInt(args[0]);
-        double target = i * service.getNumericalMean()/8.0;
-        DoubleUnaryOperator fn = x -> x * service.density(x);
-        Bracket bracket = new Bracket(fn, target);
-        System.out.println(bracket.lower());
-        System.out.println(bracket.upper());
+        double shape = Weibull.fitShapeToCoefficientOfVariation(0.001);
+        double scale = Weibull.fitScaleToMeanAndShape(0.6, shape);
+        System.out.println(shape);
+        System.out.println(scale);
+        Distribution dist = new Weibull(scale, shape);
+        System.out.println(dist.getNumericalMean());
     }
 }

@@ -4,7 +4,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
 public class BisectionSolver {
-    private final int MAX_ITER = 1000;
+    private final int MAX_ITER = 10000;
     private DoubleUnaryOperator fn;
     private double lower;
     private double upper;

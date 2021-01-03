@@ -24,10 +24,4 @@ public class Misc {
     public static double gamma(double x) { 
         return Math.exp(logGamma(x));
     }
-
-    public static void main(String[] args) {
-        System.out.println(factorial(-1));
-        for (int i = 0; i < 30; i++)
-            System.out.println(i + " " + factorial(i));
-    }
 }
