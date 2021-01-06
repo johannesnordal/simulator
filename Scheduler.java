@@ -1,7 +1,6 @@
 import java.util.ArrayDeque;
 
-public abstract class Scheduler implements EventSource<Client> {
-
+public abstract class Scheduler implements EventSource<Client>, Simulator {
     public abstract void step(double nextStep);    
     public abstract void schedule(Client incoming);
     public abstract double work();
@@ -20,6 +19,9 @@ public abstract class Scheduler implements EventSource<Client> {
         schedule(incoming);
     }
 
+    /********************************************************
+    *   EventSource<T> interface.                           *
+    ********************************************************/
     public void registerObserver(Observer<Client> observer) {
         if (observer.isObserving(Event.ARRIVAL))
             arrivalObserver.add(observer);
@@ -35,5 +37,34 @@ public abstract class Scheduler implements EventSource<Client> {
             for (Observer<Client> x : departureObserver)
                 x.update(event, client);
         }
+    }
+
+    /**************************************
+    *   Simulator interface.              *
+    **************************************/
+    public void simulate(Observer<Client> observer,
+            Distribution arrival,
+            Distribution service,
+            int numberOfClients) {
+        registerObserver(observer);
+        simulate(arrival, service, numberOfClients);
+    }
+
+    public Stats simulate(Distribution arrival,
+            Distribution service,
+            int numberOfClients) {
+        Stats stats = new Stats();
+        registerObserver(stats);
+        sim(arrival, service, numberOfClients);
+        return stats;
+    }
+
+    private void sim(Distribution arrival,
+            Distribution service,
+            int numberOfClients) {
+        ClientFactory client = new ClientFactory(arrival,
+                service, numberOfClients);
+        while (client.hasNext())
+            receive(client.next());
     }
 }

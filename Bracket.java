@@ -13,18 +13,20 @@ public class Bracket {
         this.fn = fn;
         lower = calculateBound(x -> x <= 0);
         upper = calculateBound(x -> x >= 0); 
+        // lower = calculateBound(x -> x < 0);
+        // upper = calculateBound(x -> x > 0); 
     }
 
     private OptionalDouble calculateBound(DoublePredicate p) {
         DoubleUnaryOperator[] parameters = {
             x ->  x/1.0, x ->  1.0/x,
-            x -> -x/1.0, x -> -1.0/x
+            // x -> -x/1.0, x -> -1.0/x
         };
         for (int i = 1; i <= MAX_ITER; i += 10) {
             for (DoubleUnaryOperator param : parameters) {
-                double x = param.applyAsDouble(i);
-                if (p.test(fn.applyAsDouble(x)))
-                    return OptionalDouble.of(x);
+                double u = param.applyAsDouble(i);
+                if (p.test(fn.applyAsDouble(u)))
+                    return OptionalDouble.of(u);
             }
         }
         return OptionalDouble.empty();
@@ -43,11 +45,43 @@ public class Bracket {
     }
 
     public static void main(String[] args) {
-        double shape = Weibull.fitShapeToCoefficientOfVariation(0.001);
-        double scale = Weibull.fitScaleToMeanAndShape(0.6, shape);
-        System.out.println(shape);
-        System.out.println(scale);
-        Distribution dist = new Weibull(scale, shape);
-        System.out.println(dist.getNumericalMean());
+        Distribution d = new BoundedPareto(0.3, 0.01, 2.0);
+        double target = d.getNumericalMean()/2.0;
+        DoubleUnaryOperator fn = x -> {
+            return x * d.density(x) - target;
+        };
+        System.out.println(d.getNumericalMean());
+        System.out.println(2 * d.density(2));
+        System.out.println("target: " + target);
+        /*
+        double x = Double.parseDouble(args[0]);
+        System.out.println(fn.applyAsDouble(x));
+        System.out.println(fn.applyAsDouble(1.0/x));
+        */
+        Bracket bracket = new Bracket(fn);
+        if (bracket.isBracketing()) {
+            double lo = bracket.lower().getAsDouble();
+            double hi = bracket.upper().getAsDouble();
+            System.out.println("lo: " + lo);
+            System.out.println("hi: " + hi);
+            System.out.println("f(lo): " + fn.applyAsDouble(lo));
+            System.out.println("f(hi): " + fn.applyAsDouble(hi));
+        } else {
+            System.out.println("Doesn't bracket.");
+            if (bracket.lower().isPresent()) {
+                double lo = bracket.lower().getAsDouble();
+                System.out.println("lo: " + lo);
+                System.out.println("f(lo): " + fn.applyAsDouble(lo));
+            } else {
+                System.out.println("Lower bound missing.");
+            }
+            if (bracket.upper().isPresent()) {
+                double hi = bracket.upper().getAsDouble();
+                System.out.println("hi: " + hi);
+                System.out.println("f(hi): " + fn.applyAsDouble(hi));
+            } else {
+                System.out.println("Upper bound missing.");
+            }
+        }
     }
 }

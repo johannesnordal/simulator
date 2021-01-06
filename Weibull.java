@@ -52,4 +52,9 @@ public class Weibull extends Distribution {
     public static double fitScaleToMeanAndShape(double mean, double shape) {
         return mean / Misc.gamma(1 + (1/shape));
     }
+
+    public static void main(String[] args) {
+        Distribution dist = new Weibull(0.68, 2.1);
+        System.out.println(dist.density(0.0));
+    }
 }

@@ -29,4 +29,10 @@ public abstract class Distribution {
     public double getNumericalVariance() {
         return mgf(2) - pow(mgf(1), 2);
     }
+
+    public double[] support() {
+        // return new double[] {1.0E-100, Double.POSITIVE_INFINITY};
+        return new double[] {1.0E-50, Double.POSITIVE_INFINITY};
+        // return new double[] {0.0, Double.POSITIVE_INFINITY};
+    }
 }

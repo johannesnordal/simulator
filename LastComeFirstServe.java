@@ -56,4 +56,14 @@ public class LastComeFirstServe extends Scheduler {
         if (server.running() == null) return 0;
         return stack.size() + 1;
     }
+
+    public static void main(String[] args) {
+        Simulator simulator = new LastComeFirstServe();
+        Stats stats = simulator.simulate(
+                new Exponential(1.0),
+                new Exponential(2.0),
+                10000000);
+        System.out.println(stats.waiting().first());
+        System.out.println(stats.response().first());
+    }
 }

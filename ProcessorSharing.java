@@ -68,4 +68,22 @@ public class ProcessorSharing extends Scheduler {
     public void speed(double speed) {
         this.speed = speed;
     }
+
+    public static void main(String[] args) {
+        int n = 10000000;
+        Distribution arrival = new Exponential(1.0);
+        Distribution service = new Uniform(0.0, 0.5);
+        Simulator simulator = new FirstComeFirstServe();
+        Stats stats = simulator.simulate(arrival, service, n);
+        System.out.println("First Come, First Serve.");
+        System.out.println(stats.waiting().first());
+        System.out.println(stats.response().first());
+        System.out.println();
+
+        System.out.println("Processor Sharing.");
+        simulator = new ProcessorSharing();
+        stats = simulator.simulate(arrival, service, n);
+        System.out.println(stats.waiting().first());
+        System.out.println(stats.response().first());
+    }
 }

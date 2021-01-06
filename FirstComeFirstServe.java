@@ -1,13 +1,12 @@
-import java.util.Queue;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 public class FirstComeFirstServe extends Scheduler {
-    private Queue<Client> pq;
+    private ArrayDeque<Client> pq;
     private Server server;
     private double work;
 
     public FirstComeFirstServe() {
-        pq = new LinkedList<Client>();
+        pq = new ArrayDeque<Client>();
         server = new Server();
     }
 
@@ -59,5 +58,15 @@ public class FirstComeFirstServe extends Scheduler {
         double work = server.running().status();
         for (Client x : pq) work += x.status();
         return work;
+    }
+
+    public static void main(String[] args) {
+        Simulator simulator = new FirstComeFirstServe();
+        Stats stats = simulator.simulate(
+                new Exponential(1.0),
+                new Exponential(2.0),
+                10000000);
+        System.out.println(stats.waiting().first());
+        System.out.println(stats.response().first());
     }
 }

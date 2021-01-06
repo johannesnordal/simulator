@@ -31,7 +31,7 @@ public class BisectionSolver {
         double mid;
         for (int i = 0; i < MAX_ITER; i++) {
             mid = (upper + lower)/2.0;
-            if (abs(fn.applyAsDouble(mid)) < 1.0E-4) {
+            if (abs(fn.applyAsDouble(mid)) < 1.0E-3) {
                 return OptionalDouble.of(mid);
             }
             if (oppositeSign(lower, mid))

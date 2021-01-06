@@ -2,41 +2,51 @@ import static java.lang.Math.pow;
 import static java.lang.Math.log;
 
 public class BoundedPareto extends Distribution {
-    private double shape;
-    private double low;
-    private double high;
+    private final double shape;
+    private final double lower;
+    private final double upper;
 
-    public BoundedPareto(double shape, double low, double high) {
+    public BoundedPareto(double shape, double lower, double upper) {
         this.shape = shape;
-        this.low = low;
-        this.high = high;
+        this.lower = lower;
+        this.upper = upper;
     }
 
     public double sample() {
-        double r = rnd.nextDouble();
-        double numerator = -(r*pow(high, shape) - r*pow(low, shape) - pow(high, shape));
-        double denominator = pow(high, shape) * pow(low, shape);
-        double base = numerator / denominator;
-        double exponent = -(1 / shape);
+        final double r = rnd.nextDouble();
+        final double numerator = -(r * pow(upper, shape)
+                - r * pow(lower, shape)
+                - pow(upper, shape));
+        final double denominator = pow(upper, shape) * pow(lower, shape);
+        final double base = numerator/denominator;
+        final double exponent = -(1/shape);
         return pow(base, exponent);
     }
 
     public double density(double x) {
-        double numerator = shape * pow(low, shape) * pow(x, -shape - 1);
-        double denominator = 1 - pow(low/high, shape);
-        return numerator / denominator;
+        if (x < lower || x > upper) return 0.0;
+        final double pow = -shape - 1;
+        final double shapexpow = pow(shape * x, pow);
+        final double numer = lower * shape;
+        final double denom = 1 - pow(lower/upper, shape);
+        return shapexpow * (numer/denom);
+    }
+
+    @Override
+    public double[] support() {
+        return new double[] {lower, upper};
     }
 
     protected double mgf(int moment) {
         double m = Double.valueOf(moment);
         if (m == shape) {
-            double numerator = (shape * pow(low, shape)) * log(high/low);
-            double denominator = 1 - pow(low/high, shape);
+            double numerator = (shape * pow(lower, shape)) * log(upper/lower);
+            double denominator = 1 - pow(lower/upper, shape);
             return numerator / denominator;
         } else {
-            double numerator = shape * (pow(high, shape) * pow(low, m)
-                - pow(high, m) * pow(low, shape));
-            double denominator = (shape - m) * (pow(high, shape) - pow(low, shape));
+            double numerator = shape * (pow(upper, shape) * pow(lower, m)
+                - pow(upper, m) * pow(lower, shape));
+            double denominator = (shape - m) * (pow(upper, shape) - pow(lower, shape));
             return numerator / denominator;
         }
     }
