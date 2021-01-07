@@ -1,0 +1,47 @@
+<project name="serverpool" default="dist">
+    <target name="init" description="Creates needed directories.">
+        <mkdir dir="bin"/>
+        <mkdir dir="dist"/>
+    </target>
+
+    <target name="clean" description="Cleans up build and dist.">
+        <delete dir="bin"/>
+        <delete dir="dist"/>
+    </target>
+
+    <target name="compile" depends="init" description="Compiles source to bin.">
+        <javac destdir="bin" includeantruntime="false">
+            <classpath>
+                <pathelement location="libs/commons-math3-3.6.1.jar"/>
+                <pathelement location="libs/sqlite-jdbc-3.18.0.jar"/>
+            </classpath>
+            <src path="src"/>
+            <src path="src/analysis"/>
+            <src path="src/dispatcher"/>
+            <src path="src/distribution"/>
+            <src path="src/scheduler"/>
+            <src path="src/stats"/>
+            <src path="src/system"/>
+            <!--<src path="src/util"/>-->
+        </javac>
+    </target>
+
+    <target name="dist" depends="compile" description="Package spool into .jar">
+        <jar destfile="dist/spool.jar" basedir="bin">
+            <manifest>
+	            <attribute 
+                    name="Main-Class"
+                    value="spool.MainController">
+                </attribute>
+                <attribute
+                    name="Class-Path"
+                    value="../libs/commons-math3-3.6.1.jar ../libs/sqlite-jdbc-3.18.0.jar">
+                </attribute>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="dist">
+        <java jar="dist/spool.jar" fork="true"/>
+    </target>
+</project>
