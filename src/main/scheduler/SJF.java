@@ -1,14 +1,21 @@
 package spool;
 
-import java.util.Deque;
-import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
-public class LastComeFirstServe extends Scheduler {
-    private ArrayDeque<Client> stack;
+public class SJF extends Scheduler {
+
+    private Comparator<Client> cmp;
+    private PriorityQueue<Client> pq;
     private Server server;
 
-    public LastComeFirstServe() {
-        stack = new ArrayDeque<Client>();
+    public SJF() {
+        cmp = (x, y) -> {
+            if (x.service() < y.service()) return -1;
+            if (x.service() > y.service()) return 1;
+            return 0;
+        };
+        pq = new PriorityQueue<Client>(cmp);
         server = new Server();
     }
 
@@ -16,10 +23,8 @@ public class LastComeFirstServe extends Scheduler {
         registerEvent(Event.ARRIVAL, incoming);
         if (server.running() == null) {
             server.running(incoming);
-        } else {
-            stack.push(server.running());
-            server.running(incoming);
         }
+        pq.offer(incoming);
     }
 
     public void step(double nextStep) {
@@ -34,11 +39,11 @@ public class LastComeFirstServe extends Scheduler {
     private void swap() {
         Client running = server.running();
         registerEvent(Event.DEPARTURE, running);
-        if (stack.isEmpty()) {
+        if (pq.isEmpty()) {
             server.running(null);
             return;
         }
-        Client next = stack.pop();
+        Client next = pq.remove();
         double wait = running.departure() - next.step();
         next.step(wait);
         next.waiting(wait);
@@ -46,19 +51,12 @@ public class LastComeFirstServe extends Scheduler {
     }
 
     public double work() {
-        if (server.running() == null) return 0.0;
-        double work = server.running().status();
-        for (Client x : stack) {
-            work += x.status();
-        }
+        double work = 0.0;
+        for (Client x : pq) work += x.status();
         return work;
     }
 
     public int active() {
-        if (server.running() == null) return 0;
-        return stack.size() + 1;
-    }
-
-    public static void main(String[] args) {
+        return pq.size();
     }
 }

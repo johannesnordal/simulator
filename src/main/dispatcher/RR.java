@@ -2,14 +2,14 @@ package spool;
 
 import java.util.function.Supplier;
 
-public class RoundRobin extends Dispatcher {
+public class RR extends Dispatcher {
     private int i = 0;
     
-    public RoundRobin(Scheduler[] scheduler) {
+    public RR(Scheduler[] scheduler) {
         super(scheduler);
     }
 
-    public RoundRobin(Supplier<Scheduler> scheduler, int n) {
+    public RR(Supplier<Scheduler> scheduler, int n) {
         super(scheduler, n);
     }
 
@@ -20,7 +20,6 @@ public class RoundRobin extends Dispatcher {
     }
 
     public static void main(String[] args) {
-        Dispatcher dispatcher
-            = new RoundRobin(ShortestRemainingProcessing::new, 4);
+        Dispatcher dispatcher = new RR(SRPT::new, 4);
     }
 }

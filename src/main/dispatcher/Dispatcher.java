@@ -4,9 +4,10 @@ import java.util.ArrayDeque;
 import java.util.stream.*;
 import java.util.Arrays;
 import java.util.function.Supplier;
+import static spool.Stats.StatsBuilder;
 import static java.util.stream.Collectors.toList;
 
-public abstract class Dispatcher implements EventSource, Simulator {
+public abstract class Dispatcher implements EventSource, Simulation {
     private ArrayDeque<Observer> observer;
     protected Scheduler[] scheduler;
     
@@ -48,10 +49,14 @@ public abstract class Dispatcher implements EventSource, Simulator {
             Distribution service,
             int numberOfClients)
     {
-        Stats[] stats = new Stats[scheduler.length];
+        StatsBuilder[] builder = new StatsBuilder[scheduler.length];
         for (int i = 0; i < scheduler.length; i++)
-            scheduler[i].registerObserver((stats[i] = new Stats()));
+            scheduler[i].registerObserver((builder[i] = new StatsBuilder()));
         sim(arrival, service, numberOfClients);
+        Stats[] stats = new Stats[builder.length];
+        for (int i = 0; i < stats.length; i++) {
+            stats[i] = builder[i].build();
+        }
         return stats;
     }
 }

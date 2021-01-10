@@ -1,38 +1,9 @@
 package spool;
 
-class Moment {
-    private double first;
-    private double second;
-    private int denom = 0;
-
-    public void accum(double x) {
-        first   += x;
-        second  += Math.pow(x,2);
-    }
-
-    public Moment denom(int denom) {
-        this.denom = denom;
-        return this;
-    }
-
-    public double first() {
-        return first/denom;
-    }
-
-    public double second() {
-        return second/denom;
-    }
-
-    public double variance() {
-        return second() - Math.pow(first(),2);
-    }
-}
-
 public class Stats implements Observer {
     private Moment interarrival;
     private Moment service;
     private Moment waiting;
-    private Moment departure;
     private Moment response;
     private Moment slowdown;
     private double lastArrival;
@@ -43,9 +14,45 @@ public class Stats implements Observer {
         interarrival = new Moment();
         service = new Moment();
         waiting = new Moment();
-        departure = new Moment();
         response = new Moment();
         slowdown = new Moment();
+    }
+
+    public static Stats merge(Stats[] stats) {
+        Moment interarrival = new Moment();
+        Moment service = new Moment();
+        Moment waiting = new Moment();
+        Moment response = new Moment();
+        Moment slowdown = new Moment();
+        int arrivals = 0;
+        int departures = 0;
+        for (Stats x : stats) {
+            interarrival.merge(x.interarrival());
+            service.merge(x.service());
+            waiting.merge(x.waiting());
+            response.merge(x.response());
+            slowdown.merge(x.slowdown());
+            arrivals += x.arrivals;
+            departures += x.departures;
+        }
+        return new Stats(interarrival, service, waiting, response,
+                slowdown, arrivals, departures);
+    }
+
+    private Stats(Moment interarrival,
+            Moment service,
+            Moment waiting,
+            Moment response,
+            Moment slowdown,
+            int arrivals,
+            int departures) {
+        this.interarrival = interarrival;
+        this.service = service;
+        this.waiting = waiting;
+        this.response = response;
+        this.slowdown = slowdown;
+        this.arrivals = arrivals;
+        this.departures = departures;
     }
 
     public void interarrival(Client x) {
@@ -59,10 +66,6 @@ public class Stats implements Observer {
 
     public void waiting(Client x) {
         waiting.accum(x.waiting());
-    }
-
-    public void departure(Client x) {
-        departure.accum(x.departure());
     }
 
     public void response(Client x) {
@@ -85,10 +88,6 @@ public class Stats implements Observer {
         return waiting.denom(departures);
     }
 
-    public Moment departure() {
-        return departure.denom(departures);
-    }
-
     public Moment response() {
         return response.denom(departures);
     }
@@ -108,7 +107,7 @@ public class Stats implements Observer {
     public void update(Event event, Client client) {
         if (event == Event.ARRIVAL)
             registerArrival(client);
-        else if (event == Event.DEPARTURE)
+        else
             registerDeparture(client);
     }
 
@@ -122,7 +121,6 @@ public class Stats implements Observer {
         waiting(client);
         response(client);
         slowdown(client);
-        departure(client);
         departures++;
     }
 }

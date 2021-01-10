@@ -5,8 +5,6 @@ import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import static java.lang.Math.sqrt;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.Supplier;
-import java.util.OptionalDouble;
 
 public class Weibull extends Distribution {
     private double scale;

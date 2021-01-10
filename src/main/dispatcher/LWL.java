@@ -4,13 +4,13 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class LeastWorkLeft extends Dispatcher {
+public class LWL extends Dispatcher {
 
-    public LeastWorkLeft(Supplier<Scheduler> scheduler, int n) {
+    public LWL(Supplier<Scheduler> scheduler, int n) {
         super(scheduler, n);
     }
 
-    public LeastWorkLeft(Scheduler[] scheduler) {
+    public LWL(Scheduler[] scheduler) {
         super(scheduler);
     }
 

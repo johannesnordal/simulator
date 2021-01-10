@@ -2,7 +2,7 @@ package spool;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.exp;
-import java.util.Random;
+import static spool.Misc.factorial;
 
 public class Exponential extends Distribution 
 {

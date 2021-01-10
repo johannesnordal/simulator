@@ -25,16 +25,6 @@ public class Client {
         this.id = id;
     }
 
-    /*
-    public static Client[] batch(Distribution service, double arrival, int n) {
-        Client[] batch = new Client[n];
-        for (int i = 0; i < n; i++) {
-            batch[i] = new Client(arrival, service.draw());
-        }
-        return batch;
-    }
-    */
-
     public void step(double slice) {
         step += (slice < 0 ? 0.0 : slice);
     }
@@ -94,5 +84,10 @@ public class Client {
 
     public int id() {
         return id;
+    }
+
+    public String toString() {
+        return
+        "Client:  " + id + "\nArrival: " + arrival + "\nService: " + service;
     }
 }

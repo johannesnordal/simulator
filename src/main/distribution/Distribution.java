@@ -24,11 +24,11 @@ public abstract class Distribution {
         return seed;
     }
 
-    public double getNumericalMean() {
+    public double mean() {
         return mgf(1);
     }
 
-    public double getNumericalVariance() {
+    public double variance() {
         return mgf(2) - pow(mgf(1), 2);
     }
 

@@ -1,11 +1,10 @@
 package spool;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.stream.*;
-import static java.util.stream.Collectors.toList;
+import static spool.Stats.StatsBuilder;
 
-public abstract class Scheduler implements EventSource, Simulator {
+public abstract class Scheduler implements EventSource, Simulation {
+
     public abstract void step(double nextStep);    
     public abstract void schedule(Client incoming);
     public abstract double work();
@@ -35,14 +34,10 @@ public abstract class Scheduler implements EventSource, Simulator {
     public Stats[] simulate(Distribution arrival,
             Distribution service,
             int numberOfClients) {
-        Stats[] stats = Stream
-            .generate(Stats::new)
-            .limit(1)
-            .collect(toList())
-            .toArray(new Stats[1]);
-        Arrays.stream(stats).forEach(this::registerObserver);
+        StatsBuilder builder = new StatsBuilder();
+        registerObserver(builder);
         sim(arrival, service, numberOfClients);
-        return stats;
+        return new Stats[] { builder.build() };
     }
 
     private void sim(Distribution arrival,

@@ -4,15 +4,15 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class JoinShortestQueue extends Dispatcher {
+public class JSQ extends Dispatcher {
     private Random random;
 
-    public JoinShortestQueue(Supplier<Scheduler> scheduler, int n) {
+    public JSQ(Supplier<Scheduler> scheduler, int n) {
         super(scheduler, n);
         random = new Random();
     }
 
-    public JoinShortestQueue(Scheduler[] scheduler) {
+    public JSQ(Scheduler[] scheduler) {
         super(scheduler);
     }
 

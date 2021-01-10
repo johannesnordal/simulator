@@ -5,13 +5,14 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 
-public class ProcessorSharing extends Scheduler {
+public class PS extends Scheduler {
+    
     private Comparator<Client> cmp;
     private Queue<Client> pq;
     private Server server;
     private double speed = 1.0;
 
-    public ProcessorSharing() {
+    public PS() {
         cmp = (x, y) -> {
             if (x.status() < y.status()) return -1;
             if (x.status() > y.status()) return 1;
@@ -69,8 +70,5 @@ public class ProcessorSharing extends Scheduler {
 
     public void speed(double speed) {
         this.speed = speed;
-    }
-
-    public static void main(String[] args) {
     }
 }

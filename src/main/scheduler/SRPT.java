@@ -3,12 +3,13 @@ package spool;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class ShortestRemainingProcessing extends Scheduler {
+public class SRPT extends Scheduler {
+
     private Comparator<Client> cmp;
     private PriorityQueue<Client> pq;
     private Server server;
 
-    public ShortestRemainingProcessing() {
+    public SRPT() {
         cmp = (x, y) -> {
             if (x.status() < y.status()) return -1;
             if (x.status() > y.status()) return 1;
