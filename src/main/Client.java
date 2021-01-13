@@ -1,19 +1,23 @@
 package spool;
 
+import java.util.Comparator;
+import java.util.function.Supplier;
+import java.util.function.Predicate;
+import java.util.function.DoubleSupplier;
+import java.util.function.ToDoubleFunction;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 public class Client {
     private double step;
     private double status;
     private double arrival;
     private double service;
     private double waiting;
-    private int id = -1;
+    private int id;
 
     public Client(double arrival, double service) {
-        this.step = arrival;
-        this.status = service;
-        this.arrival = arrival;
-        this.service = service;
-        this.waiting = 0.0;
+        this(arrival, service, -1);
     }
 
     public Client(double arrival, double service, int id) {
@@ -25,20 +29,32 @@ public class Client {
         this.id = id;
     }
 
-    public void step(double slice) {
-        step += (slice < 0 ? 0.0 : slice);
+    public static Stream<Client> streamOf(Distribution arrival,
+            Distribution service,
+            int numberOfClients) {
+        Supplier<Client> client = new Supplier<>() {
+            private double clock = 0.0;
+            private int id = 0;
+            public Client get() {
+                clock += arrival.sample();
+                return new Client(clock, service.sample(), id++);
+            }
+        };
+        return Stream.generate(client).limit(numberOfClients);
     }
 
-    public void status(double service) {
-        status -= (status - service <= 0.0 ? 0.0 : service);
+    public void step(double slice) {
+        if (slice <= 0) return;
+        step += slice;
+    }
+
+    public void status(double serviceSlice) {
+        status -= serviceSlice;
+        if (status < 0) status = 0;
     }
 
     public void finish() {
         status = 0.0;
-    }
-
-    public void waiting(double wait) {
-        waiting += (wait < 0.0 ? 0.0 : wait);
     }
 
     public void id(int id) {
@@ -65,29 +81,85 @@ public class Client {
         return service;
     }
 
-    public double waiting() {
-        // return waiting; 
-        return response() - service();
-    }
-
-    public double departure() {
-        return step;
-    }
-
-    public double response() {
-        return step - arrival; 
-    }
-
-    public double slowdown() {
-        return response() / service;
-    }
-
     public int id() {
         return id;
     }
 
     public String toString() {
-        return
-        "Client:  " + id + "\nArrival: " + arrival + "\nService: " + service;
+        String id = "?";
+        if (this.id != -1) {
+            id = id.valueOf(this.id);
+        }
+        return new StringBuilder().append("Client:\t").append(id)
+            .append("\nArrival:\t").append(arrival)
+            .append("\nService:\t").append(service)
+            .append("\nStep:\t").append(step)
+            .append("\nStatus:\t").append(status)
+            .toString();
+    }
+
+    public static double waiting(Client x) {
+        return response(x) - x.service();
+    }
+
+    public static double response(Client x) {
+        return x.step() - x.arrival();
+    }
+
+    public static double slowdown(Client x) {
+        return response(x) / x.service();
+    }
+
+    public static Comparator<Client> comparator(ToDoubleFunction<Client> fn) {
+        Comparator<Client> cmp = (x, y) -> {
+            if (fn.applyAsDouble(x) < fn.applyAsDouble(y)) return -1;
+            if (fn.applyAsDouble(x) > fn.applyAsDouble(y)) return 1;
+            return 0;
+        };
+        return cmp;
+    }
+
+    public static Comparator<Client> arrivalComparator() {
+        return comparator(x -> x.arrival());
+    }
+
+    public static Comparator<Client> serviceComparator() {
+        return comparator(x -> x.service());
+    }
+
+    public static Comparator<Client> stepComparator() {
+        return comparator(x -> x.step());
+    }
+
+    public static Comparator<Client> statusComparator() {
+        return comparator(x -> x.status());
+    }
+
+    // Total received service.
+    public static double serviceAge(Client x) {
+        return x.service() - x.status();
+    }
+
+    public static Comparator<Client> serviceAgeComparator() {
+        return comparator(x -> serviceAge(x));
+    }
+
+    public static void main(String[] args) {
+        int m = 4;
+        Stats.Builder[] builder = Stream.generate(Stats.Builder::new)
+            .limit(m)
+            .toArray(Stats.Builder[]::new);
+        Dispatcher dispatcher = new LWL(SJF::new, m);
+        dispatcher.register(builder);
+
+        int n = 10_000_000;
+        Distribution arrival = new Exponential(m);
+        Distribution service = new Exponential(2);
+        streamOf(arrival, service, n).forEach(dispatcher::dispatch);
+
+        Stream.of(builder)
+            .map(x -> x.build())
+            .map(x -> x.response().first())
+            .forEach(System.out::println);
     }
 }

@@ -19,6 +19,10 @@ public class RR extends Dispatcher {
         i = (i += 1) % scheduler.length;
     }
 
+    public String toString() {
+        return "Round Robin";
+    }
+
     public static void main(String[] args) {
         Dispatcher dispatcher = new RR(SRPT::new, 4);
     }

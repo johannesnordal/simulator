@@ -20,4 +20,8 @@ public class RND extends Dispatcher {
         int i = rnd.nextInt(super.scheduler.length);
         super.scheduler[i].receive(incoming);
     }
+
+    public String toString() {
+        return "Random";
+    }
 }

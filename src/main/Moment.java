@@ -7,9 +7,18 @@ public interface Moment {
     public double second();
     public int samples();
 
+    public static Moment of(double first, double second, int samples) {
+        Moment moment = new Moment() {
+            public double first()   { return first; }
+            public double second()  { return second; }
+            public int samples()    { return samples; }
+        };
+        return moment;
+    }
+
     public static Moment merge(Moment[] collection) {
-        int samples;
         double first, second;
+        int samples;
         first = second = samples = 0;
         for (Moment x : collection) {
             first   += x.first() * x.samples();
@@ -21,15 +30,6 @@ public interface Moment {
 
     public static Moment merge(Moment x, Moment y) {
         return Moment.merge(new Moment[] {x, y});
-    }
-
-    public static Moment of(double first, double second, int samples) {
-        Moment moment = new Moment() {
-            public double first()   { return first; }
-            public double second()  { return second; }
-            public int samples()    { return samples; }
-        };
-        return moment;
     }
 
     default double variance() {

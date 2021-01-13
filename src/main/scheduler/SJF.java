@@ -2,20 +2,16 @@ package spool;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.stream.*;
+import static spool.Client.serviceComparator;
 
 public class SJF extends Scheduler {
 
-    private Comparator<Client> cmp;
     private PriorityQueue<Client> pq;
     private Server server;
 
     public SJF() {
-        cmp = (x, y) -> {
-            if (x.service() < y.service()) return -1;
-            if (x.service() > y.service()) return 1;
-            return 0;
-        };
-        pq = new PriorityQueue<Client>(cmp);
+        pq = new PriorityQueue<Client>(serviceComparator());
         server = new Server();
     }
 
@@ -44,15 +40,16 @@ public class SJF extends Scheduler {
             return;
         }
         Client next = pq.remove();
-        double wait = running.departure() - next.step();
+        double wait = running.step() - next.step();
         next.step(wait);
-        next.waiting(wait);
+        // next.waiting(wait);
         server.running(next);
     }
 
     public double work() {
         double work = 0.0;
-        for (Client x : pq) work += x.status();
+        for (Client x : pq)
+            work += x.status();
         return work;
     }
 

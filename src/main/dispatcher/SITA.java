@@ -2,7 +2,6 @@ package spool;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
-import static spool.Stats.StatsBuilder;
 import java.util.function.Supplier;
 import java.util.function.DoubleUnaryOperator;
 import java.util.OptionalDouble;
@@ -11,11 +10,21 @@ import java.util.Optional;
 public class SITA extends Dispatcher {
     private double[] interval;
 
+    public SITA(Supplier<Scheduler> scheduler, double[] interval) {
+        super(scheduler, interval.length + 1);
+        this.interval = interval;
+    }
+
+    public SITA(Scheduler[] scheduler, double[] interval) {
+        super(scheduler);
+        this.interval = interval;
+    }
+
     public SITA(Supplier<Scheduler> scheduler, int n) {
         super(scheduler, n);
     }
 
-    private SITA(Scheduler[] scheduler) {
+    public SITA(Scheduler[] scheduler) {
         super(scheduler);
     }
 
@@ -28,6 +37,11 @@ public class SITA extends Dispatcher {
         }
         scheduler[interval.length].receive(incoming); 
     } 
+
+    @Override
+    public boolean requiresSpecialInitialization() {
+        return true;
+    }
 
     private static boolean coefficientOfVariationIsTooSmall(Distribution service) {
         double std = sqrt(service.variance());
@@ -45,7 +59,8 @@ public class SITA extends Dispatcher {
             double nthRange = rangeOfJobSize * (i + 1);
             DoubleUnaryOperator fn = x -> {
                 return
-                new Integrator(b -> b * service.density(b)).integrate(a, x) - nthRange;
+                new Integrator(b ->
+                    b * service.density(b)).integrate(a, x) - nthRange;
             };    
             Bracket bracket = new Bracket(fn);
             BisectionSolver solver = new BisectionSolver(fn, bracket);
@@ -70,13 +85,36 @@ public class SITA extends Dispatcher {
         if (!optional.isPresent())
             return new RND(scheduler).simulate(arrival, service, numberOfClients);
         interval = optional.get();
-        StatsBuilder[] builder = new StatsBuilder[scheduler.length];
+        Stats.Builder[] builder = new Stats.Builder[scheduler.length];
         for (int i = 0; i < scheduler.length; i++)
-            scheduler[i].registerObserver((builder[i] = new StatsBuilder()));
+            scheduler[i].registerObserver((builder[i] = new Stats.Builder()));
         sim(arrival, service, numberOfClients);
         Stats[] stats = new Stats[builder.length];
         for (int i = 0; i < stats.length; i++)
             stats[i] = builder[i].build();
         return stats;
+    }
+
+    public String toString() {
+        return "Size Interval Task Assignment";
+    }
+
+    public static void main(String[] args) {
+        Dispatcher[] dispatcher = new Dispatcher[5]; 
+
+        int m = 4;
+        dispatcher[0] = new JSQ(FCFS::new, m);
+        dispatcher[1] = new LWL(FCFS::new, m);
+        dispatcher[2] = new RND(FCFS::new, m);
+        dispatcher[3] = new RR(FCFS::new, m);
+        double[] interval = SITA.split(m, new Exponential(2.0)).get();
+        dispatcher[4] = new SITA(FCFS::new, interval);
+
+        for (Dispatcher x : dispatcher) {
+            if (x.requiresSpecialInitialization())
+                System.out.println(x + " needs special initalization.");
+            else
+                System.out.println(x + " can be initialized normally.");
+        }
     }
 }

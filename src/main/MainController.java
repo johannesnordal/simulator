@@ -1,18 +1,17 @@
 package spool;
 
-import static spool.Simulation.simulate;
+import java.util.Optional;
+import java.util.function.DoubleUnaryOperator;
+import static spool.Misc.EPSILON;
+import static spool.Misc.compareDouble;
 
 public class MainController {
     public static void main(String[] args) {
-        int m = 4;
-        Simulation simulator = new SITA(FCFS::new, m);
-        Distribution arrival = new Exponential(m);
-        Distribution service = new Exponential(2.0);
-
-        int n = 10_000_000;
-        Stats stats = simulate(simulator, arrival, service, n);
-        System.out.println(stats.waiting().first());
-        System.out.println(stats.response().first());
-        System.out.println(stats.slowdown().first());
+        // LAS.main(args);
+        // ClientUtils.main(args);
+        // FCFS.main(args);
+        Testing.main(args);
+        // Client.main(args);
+        // SITA.main(args);
     }
 }

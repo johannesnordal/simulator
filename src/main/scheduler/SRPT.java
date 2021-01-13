@@ -2,20 +2,15 @@ package spool;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import static spool.Client.statusComparator;
 
 public class SRPT extends Scheduler {
 
-    private Comparator<Client> cmp;
     private PriorityQueue<Client> pq;
     private Server server;
 
     public SRPT() {
-        cmp = (x, y) -> {
-            if (x.status() < y.status()) return -1;
-            if (x.status() > y.status()) return 1;
-            return 0;
-        };
-        pq = new PriorityQueue<Client>(cmp);
+        pq = new PriorityQueue<Client>(statusComparator());
         server = new Server();
     }
 
@@ -42,9 +37,9 @@ public class SRPT extends Scheduler {
             return;
         }
         Client next = pq.peek();
-        double wait = running.departure() - next.step();
+        double wait = running.step() - next.step();
         next.step(wait);
-        next.waiting(wait);
+        // next.waiting(wait);
         server.running(next);
     }
 

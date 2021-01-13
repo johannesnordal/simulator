@@ -16,6 +16,10 @@ public class JSQ extends Dispatcher {
         super(scheduler);
     }
 
+    public String toString() {
+        return "Join Shortest Queue";
+    }
+
     public void dispatch(Client incoming) {
         scheduler[0].step(incoming.arrival());
         int min = scheduler[0].active();

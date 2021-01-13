@@ -1,8 +1,12 @@
 package spool;
 
 import java.lang.IllegalArgumentException;
+import static java.lang.Math.abs;
 
 public class Misc {
+
+    public static double EPSILON = 1.0E-5;
+
     public static long factorial(long n) {
         if (n < 0) {
             String err = "Negative input to factorial";
@@ -25,5 +29,9 @@ public class Misc {
 
     public static double gamma(double x) { 
         return Math.exp(logGamma(x));
+    }
+
+    public static boolean compareDouble(double x, double y) {
+        return abs(x - y) < EPSILON;
     }
 }

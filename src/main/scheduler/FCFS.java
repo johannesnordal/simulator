@@ -12,12 +12,9 @@ public class FCFS extends Scheduler {
         server = new Server();
     }
 
-    public static FCFS[] arrayOf(int n) {
-        FCFS[] a = new FCFS[n];
-        for (int i = 0; i < n; i++) {
-            a[i] = new FCFS();
-        }
-        return a;
+    public FCFS register(Observer observer) {
+        registerObserver(observer);
+        return this;
     }
 
     public void schedule(Client incoming) {
@@ -45,7 +42,7 @@ public class FCFS extends Scheduler {
             server.running(null);
             return;
         }
-        double wait = running.departure() - next.step();
+        double wait = running.step() - next.step();
         next.step(wait);
         // next.waiting(wait);
         server.running(next);

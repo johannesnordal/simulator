@@ -4,6 +4,7 @@ import static java.lang.Math.pow;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import static java.lang.Math.sqrt;
+import static spool.Misc.gamma;
 import java.util.function.DoubleUnaryOperator;
 
 public class Weibull extends Distribution {
@@ -15,8 +16,7 @@ public class Weibull extends Distribution {
         this.shape = shape;
     }
 
-    public static Weibull fitToMeanAndCV(double mean,
-            double cov) {
+    public static Weibull fitToMeanAndCV(double mean, double cov) {
         double shape = fitShapeToCoefficientOfVariation(cov);
         double scale = fitScaleToMeanAndShape(mean, shape);
         return new Weibull(scale, shape);
@@ -37,32 +37,21 @@ public class Weibull extends Distribution {
 
     protected double mgf(int m) {
         double moment = Double.valueOf(m);
-        return Math.pow(scale, moment) * Misc.gamma(1 + (moment/shape));
-    }    
+        return pow(scale, moment) * gamma(1 + (moment/shape));
+    }
 
     protected static double coefficientOfVariation(double shape) {
         return
-        sqrt(
-            (Misc.gamma((2 + shape)/shape) / pow(Misc.gamma(1 + 1/shape), 2)) - 1
-        );
+        sqrt((gamma((2 + shape)/shape) / pow(gamma(1 + 1/shape), 2)) - 1);
     }
 
-    public static double fitShapeToCoefficientOfVariation(double cov) {
-        if (cov <= 0.0) return 1.0E20;
-        DoubleUnaryOperator fn = (shape) -> {
-            return coefficientOfVariation(shape) - cov;
-        };
-        Bracket bracket = new Bracket(fn);
-        BisectionSolver solver = new BisectionSolver(fn, bracket);
-        return solver.solve().getAsDouble();
+    public static double fitShapeToCoefficientOfVariation(double cv) {
+        if (cv <= 0.0) return 1.0E20;
+        DoubleUnaryOperator fn = shape -> coefficientOfVariation(shape) - cv;
+        return new BisectionSolver(fn, new Bracket(fn)).solve().getAsDouble();
     }
 
     public static double fitScaleToMeanAndShape(double mean, double shape) {
-        return mean / Misc.gamma(1 + (1/shape));
-    }
-
-    public static void main(String[] args) {
-        Distribution dist = new Weibull(0.68, 2.1);
-        System.out.println(dist.density(0.0));
+        return mean / gamma(1 + (1/shape));
     }
 }

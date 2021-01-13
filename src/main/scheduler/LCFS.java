@@ -39,9 +39,9 @@ public class LCFS extends Scheduler {
             return;
         }
         Client next = stack.pop();
-        double wait = running.departure() - next.step();
+        double wait = running.step() - next.step();
         next.step(wait);
-        next.waiting(wait);
+        // next.waiting(wait);
         server.running(next);
     }
 

@@ -31,4 +31,8 @@ public class LWL extends Dispatcher {
         int i = new Random().nextInt(x.size());
         scheduler[x.get(i)].schedule(incoming);
     }
+
+    public String toString() {
+        return "Least Work Left";
+    }
 }

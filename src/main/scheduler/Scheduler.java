@@ -1,9 +1,9 @@
 package spool;
 
 import java.util.ArrayDeque;
-import static spool.Stats.StatsBuilder;
+import java.util.function.Supplier;
 
-public abstract class Scheduler implements EventSource, Simulation {
+public abstract class Scheduler implements EventSource, Simulation<Stats> {
 
     public abstract void step(double nextStep);    
     public abstract void schedule(Client incoming);
@@ -31,21 +31,16 @@ public abstract class Scheduler implements EventSource, Simulation {
         }
     }
 
-    public Stats[] simulate(Distribution arrival,
+    public Stats simulate(Distribution arrival,
             Distribution service,
             int numberOfClients) {
-        StatsBuilder builder = new StatsBuilder();
+        Stats.Builder builder = new Stats.Builder();
         registerObserver(builder);
         sim(arrival, service, numberOfClients);
-        return new Stats[] { builder.build() };
+        return builder.build();
     }
 
-    private void sim(Distribution arrival,
-            Distribution service,
-            int numberOfClients) {
-        ClientFactory client = new ClientFactory(arrival,
-                service, numberOfClients);
-        while (client.hasNext())
-            receive(client.next());
+    protected void sim(Distribution arrival, Distribution service, int n) {
+        Client.streamOf(arrival, service, n).forEach(this::receive);
     }
 }
