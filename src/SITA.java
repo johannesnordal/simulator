@@ -79,7 +79,8 @@ public class SITA extends Dispatcher {
     }
 
     @Override
-    public Stats[] simulate(Distribution arrival, Distribution service,
+    public Stats simulate(Distribution arrival,
+	    Distribution service,
             int numberOfClients) {
         Optional<double[]> optional = split(scheduler.length, service);
         if (!optional.isPresent())
@@ -92,7 +93,24 @@ public class SITA extends Dispatcher {
         Stats[] stats = new Stats[builder.length];
         for (int i = 0; i < stats.length; i++)
             stats[i] = builder[i].build();
-        return stats;
+        return Stats.merge(stats);
+    }
+
+    @Override
+    public void simulate(Observer[] observer,
+	    Distribution arrival,
+	    Distribution service,
+            int numberOfClients) {
+        Optional<double[]> optional = split(scheduler.length, service);
+        if (!optional.isPresent()) {
+            new RND(scheduler)
+		.simulate(observer, arrival, service, numberOfClients);
+	    return;
+	}
+        interval = optional.get();
+        for (int i = 0; i < scheduler.length; i++)
+            scheduler[i].registerObserver(observer[i]);
+        sim(arrival, service, numberOfClients);
     }
 
     public String toString() {

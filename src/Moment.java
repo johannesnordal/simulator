@@ -9,9 +9,9 @@ public interface Moment {
 
     public static Moment of(double first, double second, int samples) {
         Moment moment = new Moment() {
-            public double first()   { return first; }
-            public double second()  { return second; }
-            public int samples()    { return samples; }
+            public double first() { return first; }
+            public double second() { return second; }
+            public int samples() { return samples; }
         };
         return moment;
     }

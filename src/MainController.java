@@ -9,8 +9,8 @@ public class MainController {
     public static void main(String[] args) {
         // LAS.main(args);
         // ClientUtils.main(args);
-        // FCFS.main(args);
-        Testing.main(args);
+        FCFS.main(args);
+        // Testing.main(args);
         // Client.main(args);
         // SITA.main(args);
     }

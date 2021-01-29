@@ -16,12 +16,7 @@
                 <pathelement location="libs/junit-jupiter-api-5.7.0.jar"/>
                 <pathelement location="libs/commons-math3-3.6.1.jar"/>
             </classpath>
-            <src path="src/main"/>
-            <src path="src/test"/>
-            <src path="src/main/dispatcher"/>
-            <src path="src/main/scheduler"/>
-            <src path="src/main/distribution"/>
-            <src path="src/main/analysis"/>
+            <src path="src/"/>
         </javac>
     </target>
 

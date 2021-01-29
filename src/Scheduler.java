@@ -3,7 +3,7 @@ package spool;
 import java.util.ArrayDeque;
 import java.util.function.Supplier;
 
-public abstract class Scheduler implements EventSource, Simulation<Stats> {
+public abstract class Scheduler implements EventSource, Simulation {
 
     public abstract void step(double nextStep);    
     public abstract void schedule(Client incoming);
@@ -38,6 +38,17 @@ public abstract class Scheduler implements EventSource, Simulation<Stats> {
         registerObserver(builder);
         sim(arrival, service, numberOfClients);
         return builder.build();
+    }
+
+    public void simulate(Observer[] observer,
+	    Distribution arrival,
+	    Distribution service,
+	    int numberOfClients)
+    {
+	for (Observer x : observer) {
+	    registerObserver(x);
+	}
+	sim(arrival, service, numberOfClients);
     }
 
     protected void sim(Distribution arrival, Distribution service, int n) {

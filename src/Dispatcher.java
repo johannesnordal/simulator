@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 import static java.util.stream.Collectors.toList;
 
-public abstract class Dispatcher implements EventSource, Simulation<Stats[]> {
+public abstract class Dispatcher implements EventSource, Simulation {
 
     public abstract void dispatch(Client incoming);
 
@@ -53,7 +53,7 @@ public abstract class Dispatcher implements EventSource, Simulation<Stats[]> {
         Client.streamOf(arrival, service, n).forEach(this::dispatch);
     }
 
-    public Stats[] simulate(Distribution arrival,
+    public Stats simulate(Distribution arrival,
             Distribution service,
             int numberOfClients)
     {
@@ -65,6 +65,17 @@ public abstract class Dispatcher implements EventSource, Simulation<Stats[]> {
         for (int i = 0; i < stats.length; i++) {
             stats[i] = builder[i].build();
         }
-        return stats;
+        return Stats.merge(stats);
+    }
+
+    public void simulate(Observer[] observer,
+	    Distribution arrival,
+	    Distribution service,
+	    int numberOfClients)
+    {
+	for (int i = 0; i < scheduler.length; i++) {
+	    scheduler[i].registerObserver(observer[i]);
+	}
+	sim(arrival, service, numberOfClients);
     }
 }

@@ -44,7 +44,6 @@ public class FCFS extends Scheduler {
         }
         double wait = running.step() - next.step();
         next.step(wait);
-        // next.waiting(wait);
         server.running(next);
     }
 
@@ -60,5 +59,21 @@ public class FCFS extends Scheduler {
     }
 
     public static void main(String[] args) {
+        int n = 100_000_000;
+        Stats stats;
+        double cv, k, w, x, y;
+        for (int i = 0; i <= 6; i++) {
+            cv = i/2.0;
+            Distribution arrival = Weibull.fitToMeanAndCV(1.0/0.6, cv);
+            for (int j = 0; j <= 6; j++) {
+                cv = j/2.0;
+                Distribution service = Weibull.fitToMeanAndCV(1.0, cv);
+                w = new FCFS().simulate(arrival, service, n).waiting().first();
+                x = arrival.variance()/Math.pow(arrival.mean(), 2);
+                y = service.variance()/Math.pow(service.mean(), 2);
+                k = Misc.kingman(0.6, x, y, 1.0);
+                System.out.printf("%f %f %f\t%f\n", x, y, w, k);
+            }
+        }
     }
 }

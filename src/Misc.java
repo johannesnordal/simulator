@@ -34,4 +34,8 @@ public class Misc {
     public static boolean compareDouble(double x, double y) {
         return abs(x - y) < EPSILON;
     }
+
+    public static double kingman(double load, double scva, double scvs, double ms) {
+        return (load/(1 - load)) * ((scva + scvs)/2) * ms;
+    } 
 }

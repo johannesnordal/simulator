@@ -99,7 +99,9 @@ public class Client {
     }
 
     public static double waiting(Client x) {
-        return response(x) - x.service();
+        double w = response(x) - x.service();
+        if (w < 0.0) return 0.0;
+        return w;
     }
 
     public static double response(Client x) {
