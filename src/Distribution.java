@@ -37,4 +37,8 @@ public abstract class Distribution {
         return new double[] {1.0E-50, Double.POSITIVE_INFINITY};
         // return new double[] {0.0, Double.POSITIVE_INFINITY};
     }
+
+    public double coefficientOfVariation() {
+        return Math.sqrt(variance()/mean());
+    }
 }

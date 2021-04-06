@@ -62,17 +62,18 @@ public class FCFS extends Scheduler {
         int n = 10_000_000;
         Stats stats;
         double cv, k, w, x, y;
-        for (int i = 0; i <= 24; i++) {
-            cv = i/8.0;
+        for (int i = 0; i <= 6; i++) {
+            cv = i/2.0;
             Distribution arrival = Weibull.fitToMeanAndCV(1.0/0.6, cv);
-            for (int j = 0; j <= 24; j++) {
-                cv = j/8.0;
+            for (int j = 0; j <= 6; j++) {
+                cv = j/2.0;
                 Distribution service = Weibull.fitToMeanAndCV(1.0, cv);
-                w = new FCFS().simulate(arrival, service, n).waiting().first();
+                w = new FCFS().simulate(arrival, service, n).response().first();
                 x = Math.sqrt(arrival.variance())/arrival.mean();
                 y = Math.sqrt(service.variance())/service.mean();
-                k = Misc.kingman(0.6, x, y, 1.0);
-                System.out.printf("%f %f %f\t%f\n", x, y, w, k);
+                // k = Misc.kingman(0.6, x, y, 1.0);
+                // System.out.printf("%f %f %f\t%f\n", x, y, w, k);
+                System.out.printf("%f %f %f\n", x, y, w);
             }
 	    System.out.println();
         }

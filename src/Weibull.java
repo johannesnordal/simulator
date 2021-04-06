@@ -16,7 +16,10 @@ public class Weibull extends Distribution {
         this.shape = shape;
     }
 
-    public static Weibull fitToMeanAndCV(double mean, double cov) {
+    public static Distribution fitToMeanAndCV(double mean, double cov) {
+        if (cov == 0) {
+            return new Constant(mean);
+        }
         double shape = fitShapeToCoefficientOfVariation(cov);
         double scale = fitScaleToMeanAndShape(mean, shape);
         return new Weibull(scale, shape);

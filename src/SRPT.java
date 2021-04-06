@@ -3,6 +3,7 @@ package spool;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import static spool.Client.statusComparator;
+import static spool.Client.stepComparator;
 
 public class SRPT extends Scheduler {
 
@@ -10,7 +11,19 @@ public class SRPT extends Scheduler {
     private Server server;
 
     public SRPT() {
-        pq = new PriorityQueue<Client>(statusComparator());
+        Comparator<Client> cmp = (x, y) -> {
+            Comparator<Client> status = statusComparator();
+            Comparator<Client> step = stepComparator();
+
+            int ord = status.compare(x, y);
+
+            if (ord == 0) {
+                ord = step.compare(x, y);
+            }
+
+            return ord;
+        };
+        pq = new PriorityQueue<Client>(cmp);
         server = new Server();
     }
 
@@ -51,5 +64,18 @@ public class SRPT extends Scheduler {
 
     public int active() {
         return pq.size();
+    }
+
+    public static void main(String[] args) {
+        int n = 4;
+        Simulation simulator = new SITA(SRPT::new, n);
+
+        Distribution arrival = Weibull.fitToMeanAndCV(1.0, 0.0);
+        Distribution service = Weibull.fitToMeanAndCV(0.5, 3.0);
+        int numberOfClients = 10_000_000;
+
+        Stats stats = simulator.simulate(arrival, service, numberOfClients);
+
+        System.out.println(stats.response().first());
     }
 }
