@@ -2,26 +2,32 @@ package spool;
 
 import static java.lang.Math.pow;
 
-public class Stats {
+public class Stats
+{
     private static final int METRICS = 5;
     private int arrivals = 0;
     private int departures = 0;
     private final Moment[] moment;
 
-    public static class Builder implements Observer {
+    public static class Builder implements Observer
+    {
         private double[][] moment = new double[METRICS][2];
         private int arrivals = 0;
         private int departures = 0;
         private double lastArrival;
 
-        public void update(Event event, Client client) {
-            if (event == Event.ARRIVAL) {
+        public void update(Event event, Client client)
+        {
+            if (event == Event.ARRIVAL)
+            {
                 double interarrival = client.arrival() - lastArrival;
                 moment[0][0] += interarrival;
                 moment[0][1] += pow(interarrival, 2);
                 lastArrival = client.arrival();
                 arrivals++;
-            } else {
+            }
+            else
+            {
                 moment[1][0] += client.service();
                 moment[1][1] += pow(client.service(), 2);
                 moment[2][0] += Client.waiting(client);
@@ -34,12 +40,14 @@ public class Stats {
             }
         }
 
-        public Stats build() {
+        public Stats build()
+        {
             return new Stats(this);
         }
     }
 
-    private Stats(Builder builder) {
+    private Stats(Builder builder)
+    {
         arrivals = builder.arrivals;
         departures = builder.departures;
         moment = new Moment[METRICS];
@@ -65,7 +73,8 @@ public class Stats {
                 departures);
     }
 
-    private Stats(Moment[] moment, int arrivals, int departures) {
+    private Stats(Moment[] moment, int arrivals, int departures)
+    {
         this.moment = moment;
         this.arrivals = arrivals;
         this.departures = departures;
@@ -79,22 +88,34 @@ public class Stats {
     public int arrivals()   { return arrivals; }
     public int departures() { return departures; }
 
-    public static Stats merge(Stats[] stats) {
-        if (stats.length == 1) return stats[0];
+    public static Stats merge(Stats[] stats)
+    {
+        if (stats.length == 1)
+        {
+            return stats[0];
+        }
+
         Moment[] moment = new Moment[METRICS];
-        for (int i = 0; i < METRICS; i++) {
+
+        for (int i = 0; i < METRICS; i++)
+        {
             moment[i] = Moment.of(0.0, 0.0, 0);
         }
+
         int arrivals = 0, departures = 0;
-        for (int i = 0; i < stats.length; i++) {
+
+        for (int i = 0; i < stats.length; i++)
+        {
             moment[0] = Moment.merge(moment[0], stats[i].interarrival());
             moment[1] = Moment.merge(moment[1], stats[i].service());
             moment[2] = Moment.merge(moment[2], stats[i].waiting());
             moment[3] = Moment.merge(moment[3], stats[i].response());
             moment[4] = Moment.merge(moment[4], stats[i].slowdown());
+
             arrivals += stats[i].arrivals();
             departures += stats[i].departures();
         }
+
         return new Stats(moment, arrivals, departures);
     }
 }

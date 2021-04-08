@@ -1,6 +1,7 @@
 package spool;
 
-public interface Simulation {
+public interface Simulation
+{
     Stats simulate(Distribution arrival,
             Distribution service,
             int numberOfClients);

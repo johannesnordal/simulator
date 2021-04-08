@@ -5,8 +5,10 @@ import java.util.Optional;
 import java.util.stream.*;
 import static spool.Client.arrivalComparator;
 
-class Testing {
-    public static void main(String[] args) {
+class Testing
+{
+    public static void main(String[] args)
+    {
         int n = 10_000_000;
         Distribution arrival = new Exponential(1.0);
         Distribution service = new Exponential(2.0);

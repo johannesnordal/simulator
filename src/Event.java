@@ -1,5 +1,6 @@
 package spool;
 
-public enum Event {
+public enum Event
+{
     ARRIVAL, DEPARTURE
 }
