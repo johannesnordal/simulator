@@ -17,6 +17,7 @@ public class JSQ extends Dispatcher
     public JSQ(Scheduler[] scheduler)
     {
         super(scheduler);
+        random = new Random();
     }
 
     public String toString()
