@@ -23,6 +23,11 @@ public abstract class Scheduler implements EventSource, Simulation
         schedule(incoming);
     }
 
+    public Observer[] getObservers()
+    {
+        return observer.toArray(new Observer[observer.size()]);
+    }
+
     public void registerObserver(Observer observer)
     {
         this.observer.add(observer);

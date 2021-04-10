@@ -32,6 +32,11 @@ public abstract class Dispatcher implements EventSource, Simulation
         return false;
     }
 
+    public Observer[] getObservers()
+    {
+        return observer.toArray(new Observer[observer.size()]);
+    }
+
     public void registerObserver(Observer observer)
     {
         this.observer.add(observer);
