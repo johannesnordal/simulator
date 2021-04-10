@@ -6,17 +6,20 @@ import java.util.function.Supplier;
 
 public class LWL extends Dispatcher
 {
-    public LWL(Supplier<Scheduler> scheduler, int n)
+    public static class Builder extends AbstractBuilder<LWL>
     {
-        super(scheduler, n);
+        public LWL build()
+        {
+            return new LWL(this);
+        }
+    }
+    
+    private LWL(Builder builder)
+    {
+        super(builder);
     }
 
-    public LWL(Scheduler[] scheduler)
-    {
-        super(scheduler);
-    }
-
-    public void dispatch(Client incoming)
+    public void receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
         ArrayList<Integer> x = new ArrayList<>(scheduler.length);

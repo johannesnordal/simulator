@@ -6,17 +6,19 @@ import java.util.function.Supplier;
 
 public class JSQ extends Dispatcher
 {
-    private Random random;
-
-    public JSQ(Supplier<Scheduler> scheduler, int n)
+    public static class Builder extends AbstractBuilder<JSQ>
     {
-        super(scheduler, n);
-        random = new Random();
+        public JSQ build()
+        {
+            return new JSQ(this);
+        }
     }
 
-    public JSQ(Scheduler[] scheduler)
+    private Random random;
+
+    private JSQ(Builder builder)
     {
-        super(scheduler);
+        super(builder);
         random = new Random();
     }
 
@@ -25,7 +27,7 @@ public class JSQ extends Dispatcher
         return "Join Shortest Queue";
     }
 
-    public void dispatch(Client incoming)
+    public void receive(Client incoming)
     {
         scheduler[0].step(incoming.arrival());
         int min = scheduler[0].active();

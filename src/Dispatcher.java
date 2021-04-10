@@ -1,107 +1,43 @@
 package spool;
 
 import java.util.ArrayDeque;
-import java.util.stream.*;
-import java.util.Arrays;
-import java.util.function.Supplier;
-import static java.util.stream.Collectors.toList;
 
-public abstract class Dispatcher implements EventSource, Simulation
+public abstract class Dispatcher implements EventSource, Node
 {
-    public abstract void dispatch(Client incoming);
-
-    private ArrayDeque<Observer> observer;
+    protected Dispatcher[] dispatcher;
     protected Scheduler[] scheduler;
+    protected Node[] node;
+    protected Observer[] observer;
 
-    public Dispatcher(Supplier<Scheduler> scheduler, int n)
+    protected Dispatcher(AbstractBuilder builder)
     {
-        observer = new ArrayDeque<>();
-
-        this.scheduler = Stream.generate(scheduler)
-            .limit(n)
-            .toArray(Scheduler[]::new);
+        this.dispatcher = builder.dispatcher;
+        this.scheduler = builder.scheduler;
+        this.node = builder.node;
+        this.observer = builder.observer;
     }
 
-    public Dispatcher(Scheduler[] scheduler)
-    {
-        this.scheduler = scheduler;
-    }
-
-    public boolean requiresSpecialInitialization()
-    {
-        return false;
-    }
-
-    public Observer[] getObservers()
-    {
-        return observer.toArray(new Observer[observer.size()]);
-    }
-
-    public void registerObserver(Observer observer)
-    {
-        this.observer.add(observer);
-    }
-
-    public Dispatcher register(Observer observer, int i)
-    {
-        scheduler[i].registerObserver(observer);
-
-        return this;
-    }
-
-    public Dispatcher register(Observer[] observer)
-    {
-        for (int i = 0; i < scheduler.length; i++)
-        {
-            scheduler[i].registerObserver(observer[i]);
-        }
-
-        return this;
-    }
+    public void registerObserver(Observer observer) { }
 
     public void registerEvent(Event event, Client client)
     {
-        for (Observer x : observer)
-            x.update(event, client);
+        for (int i = 0; i < observer.length; i++)
+        {
+            observer[i].update(event, client);
+        }
     }
 
-    protected void sim(Distribution arrival, Distribution service, int n)
+    public void schedule(Client client) { }
+
+    public void step(double nextStep) { }
+
+    public double work()
     {
-        Client.streamOf(arrival, service, n).forEach(this::dispatch);
+        return 0.0;
     }
 
-    public Stats simulate(Distribution arrival,
-            Distribution service,
-            int numberOfClients)
+    public int active()
     {
-        Stats.Builder[] builder = new Stats.Builder[scheduler.length];
-
-        for (int i = 0; i < scheduler.length; i++)
-        {
-            scheduler[i].registerObserver((builder[i] = new Stats.Builder()));
-        }
-
-        sim(arrival, service, numberOfClients);
-        Stats[] stats = new Stats[builder.length];
-
-        for (int i = 0; i < stats.length; i++) 
-        {
-            stats[i] = builder[i].build();
-        }
-
-        return Stats.merge(stats);
-    }
-
-    public void simulate(Observer[] observer,
-            Distribution arrival,
-            Distribution service,
-            int numberOfClients)
-    {
-        for (int i = 0; i < scheduler.length; i++)
-        {
-            scheduler[i].registerObserver(observer[i]);
-        }
-
-        sim(arrival, service, numberOfClients);
+        return 0;
     }
 }

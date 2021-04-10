@@ -6,18 +6,26 @@ public class FCFS extends Scheduler
 {
     private ArrayDeque<Client> pq;
     private Server server;
-    private double work;
+
+    public static class Builder extends AbstractBuilder<FCFS>
+    {
+        public FCFS build()
+        {
+            return new FCFS(this);
+        }
+    }
+
+    private FCFS(Builder builder)
+    {
+        super(builder);
+        pq = new ArrayDeque<Client>();
+        server = new Server();
+    }
 
     public FCFS()
     {
         pq = new ArrayDeque<Client>();
         server = new Server();
-    }
-
-    public FCFS register(Observer observer)
-    {
-        registerObserver(observer);
-        return this;
     }
 
     public void schedule(Client incoming)
@@ -83,18 +91,5 @@ public class FCFS extends Scheduler
         }
 
         return work;
-    }
-
-    public static void main(String[] args)
-    {
-        Simulation simulator = new FCFS();
-
-        Distribution arrival = new Exponential(1.0);
-        Distribution service = new Exponential(2.0);
-        int numberOfClients = 10_000_000;
-
-        Stats stats = simulator.simulate(arrival, service, numberOfClients);
-
-        System.out.println(stats.response().first());
     }
 }

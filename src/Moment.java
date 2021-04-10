@@ -2,23 +2,21 @@ package spool;
 
 import static java.lang.Math.pow;
 
-public class Moment
+public interface Moment
 {
-    private final double first;
-    private final double second;
-    private final int samples;
-
-    private Moment(double first, double second, int samples)
-    {
-        this.first = first;
-        this.second = second;
-        this.samples = samples;
-    }
-
+    public double first();
+    public double second();
+    public int samples();
 
     public static Moment of(double first, double second, int samples)
     {
-        return new Moment(first, second, samples);
+        Moment moment = new Moment() {
+            public double first() { return first; }
+            public double second() { return second; }
+            public int samples() { return samples; }
+        };
+
+        return moment;
     }
 
     public static Moment merge(Moment[] collection) {
@@ -33,7 +31,7 @@ public class Moment
             samples += x.samples();
         }
 
-        return new Moment(first/samples, second/samples, samples);
+        return Moment.of(first/samples, second/samples, samples);
     }
 
     public static Moment merge(Moment x, Moment y)
@@ -41,23 +39,8 @@ public class Moment
         return Moment.merge(new Moment[] {x, y});
     }
 
-    public double first()
+    default double variance()
     {
-        return first;
-    }
-
-    public double second()
-    {
-        return second;
-    }
-
-    public int samples()
-    {
-        return samples;
-    }
-
-    public double variance()
-    {
-        return second - pow(first, 2);
+        return second() - pow(first(), 2);
     }
 }

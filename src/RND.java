@@ -5,24 +5,28 @@ import java.util.function.Supplier;
 
 public class RND extends Dispatcher
 {
+    public static class Builder extends AbstractBuilder<RND>
+    {
+        public RND build()
+        {
+            return new RND(this);
+        }
+    }
+
     private Random rnd;
 
-    public RND(Scheduler[] scheduler)
+    private RND(Builder builder)
     {
-        super(scheduler);
+        super(builder);
         rnd = new Random();
     }
 
-    public RND(Supplier<Scheduler> scheduler, int n)
+    public void receive(Client incoming)
     {
-        super(scheduler, n);
-        rnd = new Random();
-    }
+        registerEvent(Event.ARRIVAL, incoming);
 
-    public void dispatch(Client incoming)
-    {
-        int i = rnd.nextInt(super.scheduler.length);
-        super.scheduler[i].receive(incoming);
+        int i = rnd.nextInt(scheduler.length);
+        scheduler[i].receive(incoming);
     }
 
     public String toString()

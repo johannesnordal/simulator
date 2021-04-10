@@ -9,49 +9,42 @@ import java.util.Optional;
 
 public class SITA extends Dispatcher
 {
+    public static class Builder extends AbstractBuilder<SITA>
+    {
+        private double[] interval;
+
+        public Builder(double[] interval)
+        {
+            this.interval = interval;
+        }
+
+        public SITA build()
+        {
+            return new SITA(this);
+        }
+    }
+
     private double[] interval;
 
-    public SITA(Supplier<Scheduler> scheduler, double[] interval)
+    private SITA(Builder builder)
     {
-        super(scheduler, interval.length + 1);
-        this.interval = interval;
+        super(builder);
+        this.interval = builder.interval;
     }
 
-    public SITA(Scheduler[] scheduler, double[] interval)
-    {
-        super(scheduler);
-        this.interval = interval;
-    }
-
-    public SITA(Supplier<Scheduler> scheduler, int n)
-    {
-        super(scheduler, n);
-    }
-
-    public SITA(Scheduler[] scheduler)
-    {
-        super(scheduler);
-    }
-
-    public void dispatch(Client incoming)
+    public void receive(Client incoming)
     {
         for (int i = 0; i < interval.length; i++)
         {
             if (incoming.status() < interval[i])
             {
-                scheduler[i].receive(incoming);
+                node[i].receive(incoming);
                 return;
             }          
         }
 
-        scheduler[interval.length].receive(incoming); 
+        node[interval.length].receive(incoming); 
     } 
-
-    @Override
-    public boolean requiresSpecialInitialization()
-    {
-        return true;
-    }
 
     private static boolean coefficientOfVariationIsTooSmall(Distribution service)
     {
@@ -103,67 +96,9 @@ public class SITA extends Dispatcher
         return interval;
     }
 
-    public void interval(double[] interval)
-    {
-        this.interval = interval;
-    }
-
     public double[] interval()
     {
         return this.interval;
-    }
-
-    @Override
-    public Stats simulate(Distribution arrival,
-            Distribution service,
-            int numberOfClients)
-    {
-        interval = split(scheduler.length, service);
-
-        if (interval.length == 0)
-        {
-            return new RND(scheduler).simulate(arrival, service, numberOfClients);
-        }
-
-        Stats.Builder[] builder = new Stats.Builder[scheduler.length];
-
-        for (int i = 0; i < scheduler.length; i++)
-        {
-            scheduler[i].registerObserver((builder[i] = new Stats.Builder()));
-        }
-
-        sim(arrival, service, numberOfClients);
-        Stats[] stats = new Stats[builder.length];
-
-        for (int i = 0; i < stats.length; i++)
-        {
-            stats[i] = builder[i].build();
-        }
-
-        return Stats.merge(stats);
-    }
-
-    @Override
-    public void simulate(Observer[] observer,
-            Distribution arrival,
-            Distribution service,
-            int numberOfClients)
-    {
-        interval = split(scheduler.length, service);
-
-        if (interval.length == 0)
-        {
-            new RND(scheduler).simulate(observer, arrival, service, numberOfClients);
-
-            return;
-        }
-
-        for (int i = 0; i < scheduler.length; i++)
-        {
-            scheduler[i].registerObserver(observer[i]);
-        }
-
-        sim(arrival, service, numberOfClients);
     }
 
     public String toString()
@@ -173,35 +108,6 @@ public class SITA extends Dispatcher
 
     public static void main(String[] args)
     {
-        Dispatcher[] dispatcher = new Dispatcher[5]; 
 
-        int m = 4;
-        dispatcher[0] = new JSQ(FCFS::new, m);
-        dispatcher[1] = new LWL(FCFS::new, m);
-        dispatcher[2] = new RND(FCFS::new, m);
-        dispatcher[3] = new RR(FCFS::new, m);
-
-        double[] interval = SITA.split(m, new Exponential(2.0));
-
-        if (interval.length == 0)
-        {
-            dispatcher[4] = new RND(FCFS::new, m);
-        }
-        else
-        {
-            dispatcher[4] = new SITA(FCFS::new, interval);
-        }
-
-        for (Dispatcher x : dispatcher)
-        {
-            if (x.requiresSpecialInitialization())
-            {
-                System.out.println(x + " needs special initalization.");
-            }
-            else
-            {
-                System.out.println(x + " can be initialized normally.");
-            }
-        }
     }
 }

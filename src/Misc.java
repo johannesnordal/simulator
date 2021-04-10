@@ -1,5 +1,6 @@
 package spool;
 
+import java.lang.RuntimeException;
 import java.lang.IllegalArgumentException;
 import static java.lang.Math.abs;
 
@@ -94,6 +95,6 @@ public class Misc
             return new BoundedPareto(shape, lower, upper);
         }
 
-        return null;
+        throw new RuntimeException("cannot find Distribution: " + name);
     }
 }

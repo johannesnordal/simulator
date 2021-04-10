@@ -4,19 +4,22 @@ import java.util.function.Supplier;
 
 public class RR extends Dispatcher
 {
+    public static class Builder extends AbstractBuilder<RR>
+    {
+        public RR build()
+        {
+            return new RR(this);
+        }
+    }
+
     private int i = 0;
+
+    private RR(Builder builder)
+    {
+        super(builder);
+    }
     
-    public RR(Scheduler[] scheduler)
-    {
-        super(scheduler);
-    }
-
-    public RR(Supplier<Scheduler> scheduler, int n)
-    {
-        super(scheduler, n);
-    }
-
-    public void dispatch(Client incoming)
+    public void receive(Client incoming)
     {
         super.scheduler[i].step(incoming.arrival());
         super.scheduler[i].schedule(incoming);
@@ -30,6 +33,6 @@ public class RR extends Dispatcher
 
     public static void main(String[] args)
     {
-        Dispatcher dispatcher = new RR(SRPT::new, 4);
+
     }
 }

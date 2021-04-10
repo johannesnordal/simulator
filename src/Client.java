@@ -202,23 +202,5 @@ public class Client {
 
     public static void main(String[] args)
     {
-        int m = 4;
-
-        Stats.Builder[] builder = Stream.generate(Stats.Builder::new)
-            .limit(m)
-            .toArray(Stats.Builder[]::new);
-
-        Dispatcher dispatcher = new LWL(SJF::new, m);
-        dispatcher.register(builder);
-
-        int n = 10_000_000;
-        Distribution arrival = new Exponential(m);
-        Distribution service = new Exponential(2);
-        streamOf(arrival, service, n).forEach(dispatcher::dispatch);
-
-        Stream.of(builder)
-            .map(x -> x.build())
-            .map(x -> x.response().first())
-            .forEach(System.out::println);
     }
 }

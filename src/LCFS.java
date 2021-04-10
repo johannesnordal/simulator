@@ -90,15 +90,5 @@ public class LCFS extends Scheduler
 
     public static void main(String[] args)
     {
-        Simulation scheduler = new LCFS();
-
-        int numberOfClients = 10_000_000;
-
-        Distribution arrival = new Exponential(2.0);
-        Distribution service = new Exponential(3.0);
-
-        Stats stats = scheduler.simulate(arrival, service, numberOfClients);
-
-        System.out.println(stats.response().first());
     }
 }

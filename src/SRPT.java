@@ -92,18 +92,5 @@ public class SRPT extends Scheduler
 
     public static void main(String[] args)
     {
-        int n = 4;
-        Simulation simulator = new SITA(SRPT::new, n);
-
-        Distribution arrival = Misc.getDistribution(new String[]{
-            "Weibull.fitToMeanAndCV", "1.0", "0.0"
-        });
-        // Distribution arrival = Weibull.fitToMeanAndCV(1.0, 0.0);
-        Distribution service = Weibull.fitToMeanAndCV(0.5, 3.0);
-        int numberOfClients = 10_000_000;
-
-        Stats stats = simulator.simulate(arrival, service, numberOfClients);
-
-        System.out.println(stats.response().first());
     }
 }
