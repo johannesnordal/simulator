@@ -2,3 +2,4 @@ debugging/
 tmp/
 *.class
 *.jar
+run.sh
