@@ -1,4 +1,4 @@
-*.java
+/*.java
 *.swp
 debugging/
 tmp/
