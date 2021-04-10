@@ -61,11 +61,11 @@ public class SITA extends Dispatcher
         return std/mean < 0.001;
     }
 
-    public static Optional<double[]> split(int numberOfServers, Distribution service)
+    public static double[] split(int numberOfServers, Distribution service)
     {
         if (coefficientOfVariationIsTooSmall(service))
         {
-            return Optional.empty();
+            return new double[0];
         }
 
         double[] interval = new double[numberOfServers - 1];
@@ -86,7 +86,7 @@ public class SITA extends Dispatcher
 
             if (!bracket.isBracketing())
             {
-                return Optional.empty();
+                return new double[0];
             }
 
             BisectionSolver solver = new BisectionSolver(fn, bracket);
@@ -94,13 +94,13 @@ public class SITA extends Dispatcher
 
             if (!res.isPresent())
             {
-                return Optional.empty();
+                return new double[0];
             }
 
             interval[i] = res.getAsDouble();
         }
 
-        return Optional.of(interval);
+        return interval;
     }
 
     public void interval(double[] interval)
@@ -118,14 +118,13 @@ public class SITA extends Dispatcher
             Distribution service,
             int numberOfClients)
     {
-        Optional<double[]> optional = split(scheduler.length, service);
+        interval = split(scheduler.length, service);
 
-        if (!optional.isPresent())
+        if (interval.length == 0)
         {
             return new RND(scheduler).simulate(arrival, service, numberOfClients);
         }
 
-        interval = optional.get();
         Stats.Builder[] builder = new Stats.Builder[scheduler.length];
 
         for (int i = 0; i < scheduler.length; i++)
@@ -150,16 +149,14 @@ public class SITA extends Dispatcher
             Distribution service,
             int numberOfClients)
     {
-        Optional<double[]> optional = split(scheduler.length, service);
+        interval = split(scheduler.length, service);
 
-        if (!optional.isPresent())
+        if (interval.length == 0)
         {
             new RND(scheduler).simulate(observer, arrival, service, numberOfClients);
 
             return;
         }
-
-        interval = optional.get();
 
         for (int i = 0; i < scheduler.length; i++)
         {
@@ -184,15 +181,15 @@ public class SITA extends Dispatcher
         dispatcher[2] = new RND(FCFS::new, m);
         dispatcher[3] = new RR(FCFS::new, m);
 
-        Optional<double[]> interval = SITA.split(m, new Exponential(2.0));
+        double[] interval = SITA.split(m, new Exponential(2.0));
 
-        if (!interval.isPresent())
+        if (interval.length == 0)
         {
             dispatcher[4] = new RND(FCFS::new, m);
         }
         else
         {
-            dispatcher[4] = new SITA(FCFS::new, interval.get());
+            dispatcher[4] = new SITA(FCFS::new, interval);
         }
 
         for (Dispatcher x : dispatcher)
