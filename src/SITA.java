@@ -33,6 +33,19 @@ public class SITA extends Dispatcher
         this.interval = builder.interval;
     }
 
+    private void handle(StatusCode code, Client client)
+    {
+        switch(code)
+        {
+            case BLOCK:
+                registerEvent(Event.BLOCK, client);
+                break;
+
+            default:
+                break;
+        }
+    }
+
     public StatusCode receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
@@ -43,9 +56,9 @@ public class SITA extends Dispatcher
             {
                 StatusCode code = node[i].receive(incoming);
 
-                if (code == StatusCode.BLOCK)
+                if (code != StatusCode.ACCEPT)
                 {
-                    registerEvent(Event.BLOCK, incoming);
+                    handle(code, incoming);
                 }
 
                 return StatusCode.ACCEPT;
