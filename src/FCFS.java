@@ -34,6 +34,7 @@ public class FCFS extends Scheduler
 
         if (server.running() == null)
         {
+            // registerEvent(Event.RUNNING, incoming);
             server.running(incoming);
         }
         else
