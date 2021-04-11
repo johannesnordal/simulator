@@ -26,18 +26,4 @@ public abstract class Dispatcher implements EventSource, Node
             observer[i].update(event, client);
         }
     }
-
-    public void schedule(Client client) { }
-
-    public void step(double nextStep) { }
-
-    public double work()
-    {
-        return 0.0;
-    }
-
-    public int active()
-    {
-        return 0;
-    }
 }

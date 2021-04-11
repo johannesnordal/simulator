@@ -24,12 +24,14 @@ public class RR extends Dispatcher
         super(builder);
     }
     
-    public void receive(Client incoming)
+    public boolean receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
         node[i].receive(incoming);
         i = (i += 1) % scheduler.length;
+
+        return true;
     }
 
     public String toString()

@@ -24,7 +24,7 @@ public class LWL extends Dispatcher
         super(builder);
     }
 
-    public void receive(Client incoming)
+    public boolean receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
         ArrayList<Integer> x = new ArrayList<>(scheduler.length);
@@ -49,6 +49,8 @@ public class LWL extends Dispatcher
 
         int i = new Random().nextInt(x.size());
         scheduler[x.get(i)].schedule(incoming);
+
+        return true;
     }
 
     public String toString()

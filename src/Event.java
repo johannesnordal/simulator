@@ -2,5 +2,5 @@ package spool;
 
 public enum Event
 {
-    ARRIVAL, DEPARTURE
+    ARRIVAL, DEPARTURE, BLOCK
 }

@@ -32,7 +32,7 @@ public class JSQ extends Dispatcher
         return "Join Shortest Queue";
     }
 
-    public void receive(Client incoming)
+    public boolean receive(Client incoming)
     {
         scheduler[0].step(incoming.arrival());
         int min = scheduler[0].active();
@@ -61,5 +61,7 @@ public class JSQ extends Dispatcher
 
         int i = random.nextInt(x.size());
         scheduler[x.get(i)].schedule(incoming);
+
+        return true;
     }
 }

@@ -1,12 +1,15 @@
 package spool;
 
-public class Server implements Node
+public class Server
 {
     private Client running = null;
     private double speed = 1.0;
 
     public void step(double slice)
     {
+        if (running == null)
+            return;
+
         if (running.status() <= 0.0)
             return;
 

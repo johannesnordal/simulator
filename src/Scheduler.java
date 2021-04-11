@@ -25,10 +25,12 @@ public abstract class Scheduler implements EventSource, Node
 
     public abstract int active();
 
-    public void receive(Client incoming)
+    public boolean receive(Client incoming)
     {
         step(incoming.arrival());
         schedule(incoming);
+
+        return true;
     }
 
     public void registerEvent(Event event, Client client)

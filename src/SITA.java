@@ -33,18 +33,21 @@ public class SITA extends Dispatcher
         this.interval = builder.interval;
     }
 
-    public void receive(Client incoming)
+    public boolean receive(Client incoming)
     {
         for (int i = 0; i < interval.length; i++)
         {
             if (incoming.status() < interval[i])
             {
                 node[i].receive(incoming);
-                return;
+
+                return true;
             }          
         }
 
         node[interval.length].receive(incoming); 
+
+        return true;
     } 
 
     private static boolean coefficientOfVariationIsTooSmall(Distribution service)
