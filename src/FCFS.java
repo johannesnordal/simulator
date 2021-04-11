@@ -28,7 +28,7 @@ public class FCFS extends Scheduler
         server = new Server();
     }
 
-    public void schedule(Client incoming)
+    public boolean admit(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
@@ -40,9 +40,11 @@ public class FCFS extends Scheduler
         {
             pq.offer(incoming);
         }
+
+        return true;
     }
 
-    public void step(double nextStep)
+    public void sync(double nextStep)
     {
         double slice = server.slice(nextStep);
 
@@ -73,12 +75,12 @@ public class FCFS extends Scheduler
         server.running(next);
     }
 
-    public int active()
+    public int queueLength()
     {
         return server.running() == null ? 0 : pq.size() + 1;
     }
 
-    public double work()
+    public double remainingService()
     {
         if (server.running() == null)
             return 0.0;

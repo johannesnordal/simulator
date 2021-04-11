@@ -8,9 +8,9 @@ public class JSQ extends Dispatcher
 {
     public static class Builder extends AbstractBuilder<JSQ>
     {
-        public Builder(Scheduler[] scheduler)
+        public Builder(QueueingNode[] queueingNode)
         {
-            this.scheduler = scheduler;
+            this.queueingNode = queueingNode;
         }
 
         public JSQ build()
@@ -32,36 +32,36 @@ public class JSQ extends Dispatcher
         return "Join Shortest Queue";
     }
 
-    public boolean receive(Client incoming)
+    public StatusCode receive(Client incoming)
     {
-        scheduler[0].step(incoming.arrival());
-        int min = scheduler[0].active();
+        queueingNode[0].sync(incoming.arrival());
+        int min = queueingNode[0].queueLength();
         int j = 0;
 
-        for (int i = 1; i < scheduler.length; i++)
+        for (int i = 1; i < queueingNode.length; i++)
         {
-            scheduler[i].step(incoming.arrival()); 
+            queueingNode[i].sync(incoming.arrival()); 
 
-            if (scheduler[i].active() < min)
+            if (queueingNode[i].queueLength() < min)
             {
-                min = scheduler[i].active();
+                min = queueingNode[i].queueLength();
                 j = i;
             }
         }
 
-        ArrayList<Integer> x = new ArrayList<Integer>(scheduler.length);
+        ArrayList<Integer> x = new ArrayList<Integer>(queueingNode.length);
 
-        for (int i = 0; i < scheduler.length; i++)
+        for (int i = 0; i < queueingNode.length; i++)
         {
-            if (scheduler[i].active() == min) 
+            if (queueingNode[i].queueLength() == min) 
             {
                 x.add(i);
             }
         }
 
         int i = random.nextInt(x.size());
-        scheduler[x.get(i)].schedule(incoming);
+        queueingNode[x.get(i)].admit(incoming);
 
-        return true;
+        return StatusCode.ACCEPT;
     }
 }

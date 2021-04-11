@@ -30,15 +30,17 @@ public class SRPT extends Scheduler
         server = new Server();
     }
 
-    public void schedule(Client incoming)
+    public boolean admit(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
         pq.offer(incoming);
 
         server.running(pq.peek());
+
+        return true;
     }
 
-    public void step(double nextStep)
+    public void sync(double nextStep)
     {
         double slice = server.slice(nextStep);    
 
@@ -73,7 +75,7 @@ public class SRPT extends Scheduler
         server.running(next);
     }
 
-    public double work()
+    public double remainingService()
     {
         double work = 0.0;
 
@@ -85,12 +87,8 @@ public class SRPT extends Scheduler
         return work;
     }
 
-    public int active()
+    public int queueLength()
     {
         return pq.size();
-    }
-
-    public static void main(String[] args)
-    {
     }
 }

@@ -24,23 +24,24 @@ public class RR extends Dispatcher
         super(builder);
     }
     
-    public boolean receive(Client incoming)
+    public StatusCode receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
-        node[i].receive(incoming);
-        i = (i += 1) % scheduler.length;
+        StatusCode code = node[i].receive(incoming);
+        
+        if (code == StatusCode.BLOCK)
+        {
+            registerEvent(Event.BLOCK, incoming);
+        }
 
-        return true;
+        i = (i += 1) % node.length;
+
+        return StatusCode.ACCEPT;
     }
 
     public String toString()
     {
         return "Round Robin";
-    }
-
-    public static void main(String[] args)
-    {
-
     }
 }

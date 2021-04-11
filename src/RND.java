@@ -26,19 +26,19 @@ public class RND extends Dispatcher
         rnd = new Random();
     }
 
-    public boolean receive(Client incoming)
+    public StatusCode receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
         int i = rnd.nextInt(node.length);
-        boolean received = node[i].receive(incoming);
+        StatusCode code = node[i].receive(incoming);
 
-        if (!received)
+        if (code == StatusCode.BLOCK)
         {
             registerEvent(Event.BLOCK, incoming);
         }
 
-        return true;
+        return StatusCode.ACCEPT;
     }
 
     public String toString()

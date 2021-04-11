@@ -33,21 +33,28 @@ public class SITA extends Dispatcher
         this.interval = builder.interval;
     }
 
-    public boolean receive(Client incoming)
+    public StatusCode receive(Client incoming)
     {
+        registerEvent(Event.ARRIVAL, incoming);
+
         for (int i = 0; i < interval.length; i++)
         {
             if (incoming.status() < interval[i])
             {
-                node[i].receive(incoming);
+                StatusCode code = node[i].receive(incoming);
 
-                return true;
+                if (code == StatusCode.BLOCK)
+                {
+                    registerEvent(Event.BLOCK, incoming);
+                }
+
+                return StatusCode.ACCEPT;
             }          
         }
 
         node[interval.length].receive(incoming); 
 
-        return true;
+        return StatusCode.ACCEPT;
     } 
 
     private static boolean coefficientOfVariationIsTooSmall(Distribution service)
@@ -108,10 +115,5 @@ public class SITA extends Dispatcher
     public String toString()
     {
         return "Size Interval Task Assignment";
-    }
-
-    public static void main(String[] args)
-    {
-
     }
 }

@@ -2,5 +2,5 @@ package spool;
 
 public interface Node
 {
-    public boolean receive(Client client);
+    public StatusCode receive(Client client);
 }

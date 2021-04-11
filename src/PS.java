@@ -18,10 +18,12 @@ public class PS extends Scheduler
         server = new Server();
     }
 
-    public void schedule(Client incoming)
+    public boolean admit(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
         pq.add(incoming);
+
+        return true;
     }
 
     // This method checks if the client with the lowest remaining service
@@ -42,7 +44,7 @@ public class PS extends Scheduler
         return Double.POSITIVE_INFINITY;
     }
 
-    public void step(double nextStep)
+    public void sync(double nextStep)
     {
         if (pq.size() == 0)
             return;
@@ -100,7 +102,7 @@ public class PS extends Scheduler
         }
     }
 
-    public double work()
+    public double remainingService()
     {
         double work = 0.0;
 
@@ -112,7 +114,7 @@ public class PS extends Scheduler
         return work;
     }
 
-    public int active()
+    public int queueLength()
     {
         return pq.size();
     }
@@ -132,25 +134,5 @@ public class PS extends Scheduler
         }
 
         return client;
-    }
-
-    public static void main(String[] args)
-    {
-        PS ps = new PS();
-        Client[] client = new Client[4];
-
-        for (int i = 0; i < 4; i++)
-        {
-            client[i] = new Client(0.0, 1.0, i);
-            ps.schedule(client[i]);
-        }
-
-        ps.step(0.5);
-
-        for (Client x : client)
-        {
-            System.out.println(x);
-            System.out.println();
-        }
     }
 }

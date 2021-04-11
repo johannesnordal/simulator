@@ -8,9 +8,9 @@ public class LWL extends Dispatcher
 {
     public static class Builder extends AbstractBuilder<LWL>
     {
-        public Builder(Scheduler[] scheduler)
+        public Builder(ServicingNode[] servicingNode)
         {
-            this.scheduler = scheduler;
+            this.servicingNode = servicingNode;
         }
 
         public LWL build()
@@ -24,17 +24,18 @@ public class LWL extends Dispatcher
         super(builder);
     }
 
-    public boolean receive(Client incoming)
+    public StatusCode receive(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
-        ArrayList<Integer> x = new ArrayList<>(scheduler.length);
+
+        ArrayList<Integer> x = new ArrayList<>(servicingNode.length);
         double min = Double.MAX_VALUE;
 
-        for (int i = 0; i < scheduler.length; i++)
+        for (int i = 0; i < servicingNode.length; i++)
         {
-            scheduler[i].step(incoming.arrival());
+            servicingNode[i].sync(incoming.arrival());
 
-            double work = scheduler[i].work();
+            double work = servicingNode[i].remainingService();
 
             if (work == min) 
                 x.add(i);
@@ -42,15 +43,21 @@ public class LWL extends Dispatcher
             if (work < min)
             {
                 min = work;
-                x = new ArrayList<>(scheduler.length);
+                x = new ArrayList<>(servicingNode.length);
                 x.add(i);
             }
         }
 
         int i = new Random().nextInt(x.size());
-        scheduler[x.get(i)].schedule(incoming);
 
-        return true;
+        boolean received = servicingNode[x.get(i)].admit(incoming);
+
+        if (!received)
+        {
+            registerEvent(Event.BLOCK, incoming);
+        }
+
+        return StatusCode.ACCEPT;
     }
 
     public String toString()

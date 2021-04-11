@@ -1,36 +1,35 @@
 package spool;
 
-public abstract class Scheduler implements EventSource, Node
+public abstract class Scheduler implements EventSource, Node, SyncingNode,
+       QueueingNode, ServicingNode
 {
+    protected Node[] node;
+    protected SyncingNode[] syncingNode;
+    protected QueueingNode[] queueingNode;
+    protected ServicingNode[] servicingNode;
     protected Dispatcher[] dispatcher;
     protected Scheduler[] scheduler;
-    protected Node[] node;
     protected Observer[] observer;
 
     public Scheduler() { }
 
     protected Scheduler(AbstractBuilder builder)
     {
-        this.dispatcher = builder.dispatcher;
-        this.scheduler = builder.scheduler;
-        this.node = builder.node;
-        this.observer = builder.observer;
+        this.node           = builder.node;
+        this.syncingNode    = builder.syncingNode;
+        this.queueingNode   = builder.queueingNode;
+        this.servicingNode  = builder.servicingNode;
+        this.dispatcher     = builder.dispatcher;
+        this.scheduler      = builder.scheduler;
+        this.observer       = builder.observer;
     }
 
-    public abstract void step(double nextStep);
-
-    public abstract void schedule(Client incoming);
-
-    public abstract double work();
-
-    public abstract int active();
-
-    public boolean receive(Client incoming)
+    public StatusCode receive(Client incoming)
     {
-        step(incoming.arrival());
-        schedule(incoming);
+        sync(incoming.arrival());
+        admit(incoming);
 
-        return true;
+        return StatusCode.ACCEPT;
     }
 
     public void registerEvent(Event event, Client client)

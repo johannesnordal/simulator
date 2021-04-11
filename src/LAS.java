@@ -22,19 +22,19 @@ public class LAS extends Scheduler {
         server = new Server();
     }
 
-    public void schedule(Client incoming) { 
-
+    public boolean admit(Client incoming) { 
+        return true;
     }
 
-    public void step(double nextStep) {
+    public void sync(double nextStep) {
     
     }
 
-    public double work() {
+    public double remainingService() {
         return 0.0;
     }
 
-    public int active() {
+    public int queueLength() {
         return 0;
     }
 

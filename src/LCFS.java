@@ -14,7 +14,7 @@ public class LCFS extends Scheduler
         server = new Server();
     }
 
-    public void schedule(Client incoming)
+    public boolean admit(Client incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
@@ -27,9 +27,11 @@ public class LCFS extends Scheduler
             stack.push(server.running());
             server.running(incoming);
         }
+
+        return true;
     }
 
-    public void step(double nextStep)
+    public void sync(double nextStep)
     {
         double slice = server.slice(nextStep);
 
@@ -61,7 +63,7 @@ public class LCFS extends Scheduler
         server.running(next);
     }
 
-    public double work()
+    public double remainingService()
     {
         if (server.running() == null) 
         {
@@ -78,7 +80,7 @@ public class LCFS extends Scheduler
         return work;
     }
 
-    public int active()
+    public int queueLength()
     {
         if (server.running() == null) 
         {
