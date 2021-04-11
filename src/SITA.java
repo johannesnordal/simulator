@@ -13,9 +13,10 @@ public class SITA extends Dispatcher
     {
         private double[] interval;
 
-        public Builder(double[] interval)
+        public Builder(Node[] node, double[] interval)
         {
             this.interval = interval;
+            this.node = node;
         }
 
         public SITA build()

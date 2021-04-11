@@ -17,6 +17,14 @@ public abstract class Scheduler implements EventSource, Node
         this.observer = builder.observer;
     }
 
+    public abstract void step(double nextStep);
+
+    public abstract void schedule(Client incoming);
+
+    public abstract double work();
+
+    public abstract int active();
+
     public void receive(Client incoming)
     {
         step(incoming.arrival());

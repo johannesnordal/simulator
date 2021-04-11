@@ -8,6 +8,11 @@ public class LWL extends Dispatcher
 {
     public static class Builder extends AbstractBuilder<LWL>
     {
+        public Builder(Scheduler[] scheduler)
+        {
+            this.scheduler = scheduler;
+        }
+
         public LWL build()
         {
             return new LWL(this);
@@ -32,9 +37,7 @@ public class LWL extends Dispatcher
             double work = scheduler[i].work();
 
             if (work == min) 
-            {
                 x.add(i);
-            }
 
             if (work < min)
             {

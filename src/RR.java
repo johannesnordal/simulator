@@ -6,6 +6,11 @@ public class RR extends Dispatcher
 {
     public static class Builder extends AbstractBuilder<RR>
     {
+        public Builder(Node[] node)
+        {
+            this.node = node;
+        }
+
         public RR build()
         {
             return new RR(this);
@@ -21,8 +26,9 @@ public class RR extends Dispatcher
     
     public void receive(Client incoming)
     {
-        super.scheduler[i].step(incoming.arrival());
-        super.scheduler[i].schedule(incoming);
+        registerEvent(Event.ARRIVAL, incoming);
+
+        node[i].receive(incoming);
         i = (i += 1) % scheduler.length;
     }
 

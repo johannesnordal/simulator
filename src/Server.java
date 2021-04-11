@@ -1,6 +1,6 @@
 package spool;
 
-public class Server
+public class Server implements Node
 {
     private Client running = null;
     private double speed = 1.0;

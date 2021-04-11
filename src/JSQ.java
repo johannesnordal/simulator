@@ -8,6 +8,11 @@ public class JSQ extends Dispatcher
 {
     public static class Builder extends AbstractBuilder<JSQ>
     {
+        public Builder(Scheduler[] scheduler)
+        {
+            this.scheduler = scheduler;
+        }
+
         public JSQ build()
         {
             return new JSQ(this);
