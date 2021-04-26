@@ -5,6 +5,17 @@ public class Server
     private Client running = null;
     private double speed = 1.0;
 
+    public Server()
+    {
+        running = null;
+        speed = 1.0;
+    }
+
+    public Server(double speed)
+    {
+        this.speed = speed;
+    }
+
     public void step(double slice)
     {
         if (running == null)

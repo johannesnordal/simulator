@@ -11,9 +11,8 @@ import java.util.stream.Stream;
 public class Client {
     private double step;
     private double status;
-    private double arrival;
-    private double service;
-    private double waiting;
+    final private double arrival;
+    final private double service;
     private int id;
 
     public Client(double arrival, double service)
@@ -27,25 +26,23 @@ public class Client {
         this.status = service;
         this.arrival = arrival;
         this.service = service;
-        this.waiting = 0.0;
         this.id = id;
     }
 
     private Client(double step, double status, double arrival,
-            double service, double waiting, int id)
+            double service, int id)
     {
         this.step = step;
         this.status = status;
         this.arrival = arrival;
         this.service = service;
-        this.waiting = waiting;
         this.id = id;
     }
 
     public Client clone()
     {
         return new Client(this.step, this.status, this.arrival, this.service,
-                this.waiting, this.id);
+                this.id);
     }
 
     public static Stream<Client> streamOf(Distribution arrival,
