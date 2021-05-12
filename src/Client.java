@@ -63,7 +63,8 @@ public class Client {
 
     public void step(double slice)
     {
-        if (slice <= 0) return;
+        if (isFinished()) return;
+        if (slice <= 0)   return;
         step += slice;
     }
 
@@ -71,7 +72,7 @@ public class Client {
     {
         status -= serviceSlice;
 
-        if (status < 0) 
+        if (status < 0)
             status = 0;
     }
 

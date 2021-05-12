@@ -8,9 +8,9 @@ public class LWL extends Dispatcher
 {
     public static class Builder extends AbstractBuilder<LWL>
     {
-        public Builder(ServicingNode[] servicingNode)
+        public Builder(Scheduler[] scheduler)
         {
-            this.servicingNode = servicingNode;
+            this.scheduler = scheduler;
         }
 
         public LWL build()
@@ -28,14 +28,14 @@ public class LWL extends Dispatcher
     {
         registerEvent(Event.ARRIVAL, incoming);
 
-        ArrayList<Integer> x = new ArrayList<>(servicingNode.length);
+        ArrayList<Integer> x = new ArrayList<>(scheduler.length);
         double min = Double.MAX_VALUE;
 
-        for (int i = 0; i < servicingNode.length; i++)
+        for (int i = 0; i < scheduler.length; i++)
         {
-            servicingNode[i].sync(incoming.arrival());
+            scheduler[i].sync(incoming.arrival());
 
-            double work = servicingNode[i].remainingService();
+            double work = scheduler[i].remainingService();
 
             if (work == min) 
                 x.add(i);
@@ -43,14 +43,14 @@ public class LWL extends Dispatcher
             if (work < min)
             {
                 min = work;
-                x = new ArrayList<>(servicingNode.length);
+                x = new ArrayList<>(scheduler.length);
                 x.add(i);
             }
         }
 
         int i = new Random().nextInt(x.size());
 
-        boolean received = servicingNode[x.get(i)].admit(incoming);
+        boolean received = scheduler[x.get(i)].admit(incoming);
 
         if (!received)
         {
