@@ -3,6 +3,9 @@
 *.jar
 *.java
 *.swp
+bin
+dist
+scratch
 
 # /src
 src/*.class
