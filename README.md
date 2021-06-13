@@ -1,6 +1,6 @@
-# spool
+# Spool
 
-`spool` is a discrete-event simulation library written in Java,
+Spool is a discrete-event simulation library written in Java,
 intended to simulate server systems or server pools.
 
 # Build
