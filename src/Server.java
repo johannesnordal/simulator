@@ -2,7 +2,7 @@ package spool;
 
 public class Server
 {
-    private Client running = null;
+    private Job running = null;
     private double speed = 1.0;
 
     public Server()
@@ -57,12 +57,20 @@ public class Server
         return running.status() > 0.0;
     }
 
-    public Client running()
+    public void finish()
+    {
+        if (running == null || running.isFinished())
+            return;
+
+        step(running.status() * speed);
+    }
+
+    public Job running()
     {
         return running;
     }
 
-    public void running(Client running)
+    public void running(Job running)
     {
         this.running = running;
     }
@@ -75,5 +83,23 @@ public class Server
     public double speed()
     {
         return speed;
+    }
+
+    public static void main(String[] args)
+    {
+        int n = Integer.parseInt(args[0]);
+        for (int i = 0; i < n; i++)
+        {
+            Distribution arrival = new Exponential(1.0);
+            Distribution service = new Exponential(2.0);
+            Job job = new Job(arrival.sample(), service.sample());
+
+            Server server = new Server();
+            server.running(job);
+            server.finish();
+
+            if (server.isBusy())
+                System.out.println(server.isBusy());
+        }
     }
 }

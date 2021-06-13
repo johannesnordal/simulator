@@ -16,26 +16,26 @@ public class Stats
         private int departures = 0;
         private double lastArrival;
 
-        public void update(Event event, Client client)
+        public void update(Event event, Job job)
         {
             if (event == Event.ARRIVAL)
             {
-                double interarrival = client.arrival() - lastArrival;
+                double interarrival = job.arrival() - lastArrival;
                 moment[0][0] += interarrival;
                 moment[0][1] += pow(interarrival, 2);
-                lastArrival = client.arrival();
+                lastArrival = job.arrival();
                 arrivals++;
             }
             else
             {
-                moment[1][0] += client.service();
-                moment[1][1] += pow(client.service(), 2);
-                moment[2][0] += Client.waiting(client);
-                moment[2][1] += pow(Client.waiting(client), 2);
-                moment[3][0] += Client.response(client);
-                moment[3][1] += pow(Client.response(client), 2);
-                moment[4][0] += Client.slowdown(client);
-                moment[4][1] += pow(Client.slowdown(client), 2);
+                moment[1][0] += job.service();
+                moment[1][1] += pow(job.service(), 2);
+                moment[2][0] += Job.waiting(job);
+                moment[2][1] += pow(Job.waiting(job), 2);
+                moment[3][0] += Job.response(job);
+                moment[3][1] += pow(Job.response(job), 2);
+                moment[4][0] += Job.slowdown(job);
+                moment[4][1] += pow(Job.slowdown(job), 2);
                 departures++;
             }
         }
@@ -44,6 +44,14 @@ public class Stats
         {
             return new Stats(this);
         }
+    }
+
+    private Builder builder;
+
+    public Stats()
+    {
+        this.builder = new Builder();
+        this.moment = new Moment[METRICS];
     }
 
     private Stats(Builder builder)

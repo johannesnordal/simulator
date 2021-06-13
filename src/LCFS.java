@@ -5,16 +5,16 @@ import java.util.ArrayDeque;
 
 public class LCFS extends Scheduler
 {
-    private ArrayDeque<Client> stack;
+    private ArrayDeque<Job> stack;
     private Server server;
 
     public LCFS()
     {
-        stack = new ArrayDeque<Client>();
+        stack = new ArrayDeque<Job>();
         server = new Server();
     }
 
-    public boolean admit(Client incoming)
+    public void schedule(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
@@ -27,11 +27,9 @@ public class LCFS extends Scheduler
             stack.push(server.running());
             server.running(incoming);
         }
-
-        return true;
     }
 
-    public void sync(double nextStep)
+    public void step(double nextStep)
     {
         double slice = server.slice(nextStep);
 
@@ -48,7 +46,7 @@ public class LCFS extends Scheduler
 
     private void swap()
     {
-        Client running = server.running();
+        Job running = server.running();
         registerEvent(Event.DEPARTURE, running);
 
         if (stack.isEmpty())
@@ -57,7 +55,7 @@ public class LCFS extends Scheduler
             return;
         }
 
-        Client next = stack.pop();
+        Job next = stack.pop();
         double wait = running.step() - next.step();
         next.step(wait);
         server.running(next);
@@ -72,7 +70,7 @@ public class LCFS extends Scheduler
 
         double work = server.running().status();
 
-        for (Client x : stack)
+        for (Job x : stack)
         {
             work += x.status();
         }
@@ -88,9 +86,5 @@ public class LCFS extends Scheduler
         }
 
         return stack.size() + 1;
-    }
-
-    public static void main(String[] args)
-    {
     }
 }

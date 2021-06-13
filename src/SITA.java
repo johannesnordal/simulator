@@ -9,44 +9,16 @@ import java.util.Optional;
 
 public class SITA extends Dispatcher
 {
-    public static class Builder extends AbstractBuilder<SITA>
-    {
-        private double[] interval;
-
-        public Builder(Node[] node, double[] interval)
-        {
-            this.interval = interval;
-            this.node = node;
-        }
-
-        public SITA build()
-        {
-            return new SITA(this);
-        }
-    }
-
+    private Receiver[] receiver;
     private double[] interval;
 
-    private SITA(Builder builder)
+    public SITA(Receiver[] receiver, double[] interval)
     {
-        super(builder);
-        this.interval = builder.interval;
+        this.receiver = receiver;
+        this.interval = interval;
     }
 
-    private void handle(StatusCode code, Client client)
-    {
-        switch(code)
-        {
-            case BLOCK:
-                registerEvent(Event.BLOCK, client);
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    public StatusCode receive(Client incoming)
+    public void dispatch(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
@@ -54,20 +26,11 @@ public class SITA extends Dispatcher
         {
             if (incoming.status() < interval[i])
             {
-                StatusCode code = node[i].receive(incoming);
-
-                if (code != StatusCode.ACCEPT)
-                {
-                    handle(code, incoming);
-                }
-
-                return StatusCode.ACCEPT;
+                receiver[i].receive(incoming);
             }          
         }
 
-        node[interval.length].receive(incoming); 
-
-        return StatusCode.ACCEPT;
+        receiver[interval.length].receive(incoming); 
     } 
 
     private static boolean coefficientOfVariationIsTooSmall(Distribution service)

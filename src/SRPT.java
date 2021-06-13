@@ -2,20 +2,20 @@ package spool;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import static spool.Client.statusComparator;
-import static spool.Client.stepComparator;
+import static spool.Job.statusComparator;
+import static spool.Job.stepComparator;
 
 public class SRPT extends Scheduler
 {
-    private PriorityQueue<Client> pq;
+    private PriorityQueue<Job> pq;
     private Server server;
 
     public SRPT()
     {
-        Comparator<Client> cmp = (x, y) -> {
+        Comparator<Job> cmp = (x, y) -> {
 
-            Comparator<Client> status = statusComparator();
-            Comparator<Client> step = stepComparator();
+            Comparator<Job> status = statusComparator();
+            Comparator<Job> step = stepComparator();
 
             int ord = status.compare(x, y);
 
@@ -26,21 +26,19 @@ public class SRPT extends Scheduler
             return ord;
         };
 
-        pq = new PriorityQueue<Client>(cmp);
+        pq = new PriorityQueue<Job>(cmp);
         server = new Server();
     }
 
-    public boolean admit(Client incoming)
+    public void schedule(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
         pq.offer(incoming);
 
         server.running(pq.peek());
-
-        return true;
     }
 
-    public void sync(double nextStep)
+    public void step(double nextStep)
     {
         double slice = server.slice(nextStep);    
 
@@ -57,7 +55,7 @@ public class SRPT extends Scheduler
 
     private void swap()
     {
-        Client running = pq.remove();
+        Job running = pq.remove();
 
         registerEvent(Event.DEPARTURE, running);
 
@@ -67,7 +65,7 @@ public class SRPT extends Scheduler
             return;
         }
 
-        Client next = pq.peek();
+        Job next = pq.peek();
 
         double wait = running.step() - next.step();
         next.step(wait);
@@ -79,7 +77,7 @@ public class SRPT extends Scheduler
     {
         double work = 0.0;
 
-        for (Client x : pq) 
+        for (Job x : pq) 
         {
             work += x.status();
         }
@@ -90,5 +88,25 @@ public class SRPT extends Scheduler
     public int queueLength()
     {
         return pq.size();
+    }
+
+    public static void main(String[] args)
+    {
+        Scheduler scheduler = new SRPT();
+
+        Job x = new Job(0, 8);    // arrival=0, service=8
+        Job y = new Job(1, 1);    // arrival=1, service=1
+
+        scheduler.step(x.arrival());    // no effect
+        scheduler.schedule(x);          // puts x in server
+
+        scheduler.step(y.arrival());    // step 0..1
+        scheduler.schedule(y);          // preempt x from server
+        double status = x.status();     // 7
+
+        scheduler.step(2);              // step 1..2
+        status = y.status();            // 0
+        y.isFinished();                 // true
+
     }
 }

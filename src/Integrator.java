@@ -32,4 +32,12 @@ public class Integrator
 
         return sum * h;
     }
+
+    public static void main(String[] args) {
+        Integrator integrator = new Integrator(x -> {
+            return Math.sin(x) * Math.pow(Math.cos(x), 2);
+        });
+
+        System.out.println(integrator.integrate(0, Math.PI));
+    }
 }

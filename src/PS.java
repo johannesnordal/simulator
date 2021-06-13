@@ -4,30 +4,28 @@ import java.util.Queue;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Comparator;
-import static spool.Client.statusComparator;
+import static spool.Job.statusComparator;
 
 public class PS extends Scheduler
 {
-    private Queue<Client> pq;
+    private Queue<Job> pq;
     private Server server;
     private double speed = 1.0;
 
     public PS()
     {
-        pq = new PriorityQueue<Client>(statusComparator());
+        pq = new PriorityQueue<Job>(statusComparator());
         server = new Server();
     }
 
-    public boolean admit(Client incoming)
+    public void schedule(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
         pq.add(incoming);
-
-        return true;
     }
 
-    // This method checks if the client with the lowest remaining service
-    // departs before the next step. It does so simply by servicing the client
+    // This method checks if the job with the lowest remaining service
+    // departs before the next step. It does so simply by servicing the job
     // and either returning the time of departure or, in case it doesn't
     // depart before the next step, positive infinity.
     private double checkForDeparturesBeforeNextStep(double nextStep)
@@ -44,27 +42,27 @@ public class PS extends Scheduler
         return Double.POSITIVE_INFINITY;
     }
 
-    public void sync(double nextStep)
+    public void step(double nextStep)
     {
         if (pq.size() == 0)
             return;
 
         double interStep = checkForDeparturesBeforeNextStep(nextStep);
 
-        // If a client departs before the next step, we need to process
-        // all clients up to that point, because after the client leaves,
+        // If a job departs before the next step, we need to process
+        // all jobs up to that point, because after the job leaves,
         // we need to re-adjust the processing power for the remaining
-        // clients.
+        // jobs.
         while (interStep < nextStep)
         {
-            // If we reach this point, the client with the previously
+            // If we reach this point, the job with the previously
             // lowest remaining service time (or equal) has been processed
             // to completion.
             registerEvent(Event.DEPARTURE, pq.remove());
 
             server.speed(speed * (1.0/(pq.size() + 1)));
 
-            for (Client running : pq)
+            for (Job running : pq)
             {
                 server.running(running);
                 server.step(server.slice(interStep));
@@ -76,19 +74,19 @@ public class PS extends Scheduler
             interStep = checkForDeparturesBeforeNextStep(nextStep);
         }
 
-        // This client was processed the last time we checked for departures
+        // This job was processed the last time we checked for departures
         // that might occur before the next step but it didn't depart before
         // that time. However, we don't want to process it twice, so we 
         // remove it temporarily.
-        Client processedInLastCheckForDepartures 
+        Job processedInLastCheckForDepartures 
             = pq.size() > 0 ? pq.remove() : null;
 
         server.speed(speed * 1.0/(pq.size() + 1));
 
-        // Process the rest of the clients. None of them will finish before
-        // the next step, as the client with the lowest remaining service
+        // Process the rest of the jobs. None of them will finish before
+        // the next step, as the job with the lowest remaining service
         // didn't finish either.
-        for (Client running : pq)
+        for (Job running : pq)
         {
             server.running(running);
             server.step(server.slice(nextStep));
@@ -96,7 +94,7 @@ public class PS extends Scheduler
 
         if (processedInLastCheckForDepartures != null)
         {
-            // Now that we've processed the other clients too, we should
+            // Now that we've processed the other jobs too, we should
             // put this one back into the queue.
             pq.add(processedInLastCheckForDepartures);
         }
@@ -106,7 +104,7 @@ public class PS extends Scheduler
     {
         double work = 0.0;
 
-        for (Client x : pq)
+        for (Job x : pq)
         {
             work += x.status();
         }
@@ -122,17 +120,5 @@ public class PS extends Scheduler
     public void speed(double speed)
     {
         this.speed = speed;
-    }
-
-    public Client[] flush()
-    {
-        Client[] client = new Client[pq.size()];
-
-        for (int i = 0; !pq.isEmpty(); i++)
-        {
-            client[i] = pq.poll();
-        }
-
-        return client;
     }
 }

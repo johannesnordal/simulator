@@ -60,9 +60,13 @@ public class BisectionSolver
 
     public static void main(String[] args)
     {
-        DoubleUnaryOperator fn = x -> (x * x) - 5;
+        DoubleUnaryOperator fn = (x) -> {
+          return Math.sin(x) * Math.pow(Math.cos(x), 2);
+        };
         Bracket bracket = new Bracket(fn);
         BisectionSolver solver = new BisectionSolver(fn, bracket);
-        System.out.println(solver.solve().getAsDouble());
+        double res = solver.solve().getAsDouble();
+        System.out.println(res);
+        System.out.println(fn.applyAsDouble(res));
     }
 }

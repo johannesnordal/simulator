@@ -3,20 +3,20 @@ package spool;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.stream.*;
-import static spool.Client.serviceComparator;
+import static spool.Job.serviceComparator;
 
 public class SJF extends Scheduler
 {
-    private PriorityQueue<Client> pq;
+    private PriorityQueue<Job> pq;
     private Server server;
 
     public SJF()
     {
-        pq = new PriorityQueue<Client>(serviceComparator());
+        pq = new PriorityQueue<Job>(serviceComparator());
         server = new Server();
     }
 
-    public boolean admit(Client incoming)
+    public void schedule(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
@@ -26,11 +26,9 @@ public class SJF extends Scheduler
         }
 
         pq.offer(incoming);
-
-        return true;
     }
 
-    public void sync(double nextStep)
+    public void step(double nextStep)
     {
         double slice = server.slice(nextStep);
 
@@ -47,7 +45,7 @@ public class SJF extends Scheduler
 
     private void swap()
     {
-        Client running = server.running();
+        Job running = server.running();
         registerEvent(Event.DEPARTURE, running);
 
         if (pq.isEmpty())
@@ -56,7 +54,7 @@ public class SJF extends Scheduler
             return;
         }
 
-        Client next = pq.remove();
+        Job next = pq.remove();
         double wait = running.step() - next.step();
         next.step(wait);
         server.running(next);
@@ -66,7 +64,7 @@ public class SJF extends Scheduler
     {
         double work = 0.0;
 
-        for (Client x : pq)
+        for (Job x : pq)
         {
             work += x.status();
         }

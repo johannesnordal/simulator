@@ -6,25 +6,14 @@ import java.util.function.Supplier;
 
 public class LWL extends Dispatcher
 {
-    public static class Builder extends AbstractBuilder<LWL>
-    {
-        public Builder(Scheduler[] scheduler)
-        {
-            this.scheduler = scheduler;
-        }
+    private Scheduler[] scheduler;
 
-        public LWL build()
-        {
-            return new LWL(this);
-        }
-    }
-    
-    private LWL(Builder builder)
+    private LWL(Scheduler[] scheduler)
     {
-        super(builder);
+        this.scheduler = scheduler;
     }
 
-    public StatusCode receive(Client incoming)
+    public void dispatch(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
@@ -33,7 +22,7 @@ public class LWL extends Dispatcher
 
         for (int i = 0; i < scheduler.length; i++)
         {
-            scheduler[i].sync(incoming.arrival());
+            scheduler[i].step(incoming.arrival());
 
             double work = scheduler[i].remainingService();
 
@@ -50,14 +39,7 @@ public class LWL extends Dispatcher
 
         int i = new Random().nextInt(x.size());
 
-        boolean received = scheduler[x.get(i)].admit(incoming);
-
-        if (!received)
-        {
-            registerEvent(Event.BLOCK, incoming);
-        }
-
-        return StatusCode.ACCEPT;
+        scheduler[x.get(i)].schedule(incoming);
     }
 
     public String toString()

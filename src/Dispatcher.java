@@ -1,33 +1,29 @@
 package spool;
 
-import java.util.ArrayDeque;
+import java.util.List;
+import java.util.ArrayList;
 
-public abstract class Dispatcher implements EventSource, Node
+public abstract class Dispatcher implements EventSource, Receiver
 {
-    protected Node[] node;
-    protected SyncingNode[] syncingNode;
-    protected QueueingNode[] queueingNode;
-    protected ServicingNode[] servicingNode;
-    protected Dispatcher[] dispatcher;
-    protected Scheduler[] scheduler;
-    protected Observer[] observer;
+    private List<Observer> observers = new ArrayList<>();
 
-    protected Dispatcher(AbstractBuilder builder)
+    public abstract void dispatch(Job job);
+
+    public void receive(Job job)
     {
-        this.node           = builder.node;
-        this.syncingNode    = builder.syncingNode;
-        this.queueingNode   = builder.queueingNode;
-        this.servicingNode  = builder.servicingNode;
-        this.dispatcher     = builder.dispatcher;
-        this.scheduler      = builder.scheduler;
-        this.observer       = builder.observer;
+        dispatch(job);
     }
 
-    public void registerEvent(Event event, Client client)
+    public void registerObserver(Observer observer)
     {
-        for (int i = 0; i < observer.length; i++)
+        this.observers.add(observer);
+    }
+
+    public void registerEvent(Event event, Job job)
+    {
+        for (Observer x : observers)
         {
-            observer[i].update(event, client);
+            x.update(event, job);
         }
     }
 }

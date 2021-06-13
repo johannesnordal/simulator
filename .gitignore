@@ -1,7 +1,9 @@
-/*.java
-*.swp
-debugging/
-tmp/
+# /
 *.class
 *.jar
-run.sh
+*.java
+*.swp
+
+# /src
+src/*.class
+src/*.swp

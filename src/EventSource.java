@@ -4,5 +4,6 @@ import java.lang.RuntimeException;
 
 public interface EventSource
 {
-    public void registerEvent(Event event, Client client);
+    void registerEvent(Event event, Job job);
+    void registerObserver(Observer observer);
 }

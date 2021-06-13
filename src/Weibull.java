@@ -55,7 +55,7 @@ public class Weibull extends Distribution
         return pow(scale, moment) * gamma(1 + (moment/shape));
     }
 
-    protected static double coefficientOfVariation(double shape)
+    public static double coefficientOfVariation(double shape)
     {
         return
         sqrt((gamma((2 + shape)/shape) / pow(gamma(1 + 1/shape), 2)) - 1);
@@ -73,5 +73,12 @@ public class Weibull extends Distribution
     public static double fitScaleToMeanAndShape(double mean, double shape)
     {
         return mean / gamma(1 + (1/shape));
+    }
+
+    public static void main(String[] args) {
+        Distribution wei = Weibull.fitToMeanAndCV(1.0, 0.5);
+        System.out.println(wei.mean());
+        System.out.println(wei.variance());
+        System.out.println(wei.coefficientOfVariation());
     }
 }

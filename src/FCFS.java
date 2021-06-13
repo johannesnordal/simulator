@@ -4,48 +4,30 @@ import java.util.ArrayDeque;
 
 public class FCFS extends Scheduler
 {
-    private ArrayDeque<Client> pq;
+    private ArrayDeque<Job> pq;
     private Server server;
-
-    public static class Builder extends AbstractBuilder<FCFS>
-    {
-        public FCFS build()
-        {
-            return new FCFS(this);
-        }
-    }
-
-    private FCFS(Builder builder)
-    {
-        super(builder);
-        pq = new ArrayDeque<Client>();
-        server = new Server();
-    }
 
     public FCFS()
     {
-        pq = new ArrayDeque<Client>();
+        pq = new ArrayDeque<Job>();
         server = new Server();
     }
 
-    public boolean admit(Client incoming)
+    public void schedule(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
         if (server.running() == null)
         {
-            // registerEvent(Event.RUNNING, incoming);
             server.running(incoming);
         }
         else
         {
             pq.offer(incoming);
         }
-
-        return true;
     }
 
-    public void sync(double nextStep)
+    public void step(double nextStep)
     {
         double slice = server.slice(nextStep);
 
@@ -60,9 +42,9 @@ public class FCFS extends Scheduler
         }
     }
 
-    private void swap(Client next)
+    private void swap(Job next)
     {
-        Client running = server.running();
+        Job running = server.running();
         registerEvent(Event.DEPARTURE, running);
 
         if (next == null)
@@ -78,7 +60,7 @@ public class FCFS extends Scheduler
 
     public int queueLength()
     {
-        return server.running() == null ? 0 : pq.size() + 1;
+        return server.isBusy() ? pq.size() + 1 : 0;
     }
 
     public double remainingService()
@@ -88,11 +70,28 @@ public class FCFS extends Scheduler
 
         double work = server.running().status();
 
-        for (Client x : pq)
+        for (Job x : pq)
         {
             work += x.status();
         }
 
         return work;
+    }
+
+    public static void main(String[] args) 
+    {
+        Stats.Builder statsBuilder = new Stats.Builder();
+        Scheduler scheduler = new FCFS();
+        scheduler.registerObserver(statsBuilder);
+
+        int n = 10_000_000;
+        Distribution arrival = new Uniform(0.5, 1.5);
+        Distribution service = new Uniform(0, 1.0);
+        Job.streamOf(arrival, service, n).forEach(scheduler::receive);
+
+        Stats stats = statsBuilder.build();
+        System.out.println(stats.waiting().first());
+        System.out.println(stats.response().first());
+        System.out.println(stats.slowdown().first());
     }
 }

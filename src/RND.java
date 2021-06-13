@@ -5,40 +5,21 @@ import java.util.function.Supplier;
 
 public class RND extends Dispatcher
 {
-    public static class Builder extends AbstractBuilder<RND>
-    {
-        public Builder(Node[] node)
-        {
-            this.node = node;
-        }
-
-        public RND build()
-        {
-            return new RND(this);
-        }
-    }
-
+    private Receiver[] receiver;
     private Random rnd;
 
-    private RND(Builder builder)
+    private RND(Receiver[] receiver)
     {
-        super(builder);
+        this.receiver = receiver;
         rnd = new Random();
     }
 
-    public StatusCode receive(Client incoming)
+    public void dispatch(Job incoming)
     {
         registerEvent(Event.ARRIVAL, incoming);
 
-        int i = rnd.nextInt(node.length);
-        StatusCode code = node[i].receive(incoming);
-
-        if (code == StatusCode.BLOCK)
-        {
-            registerEvent(Event.BLOCK, incoming);
-        }
-
-        return StatusCode.ACCEPT;
+        int i = rnd.nextInt(receiver.length);
+        receiver[i].receive(incoming);
     }
 
     public String toString()

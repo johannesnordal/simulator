@@ -27,4 +27,11 @@ public class Exponential extends Distribution
     {
         return scale * Math.exp(-scale * x);
     }
+
+    public static void main(String[] args) {
+        Distribution exp = new Exponential(1);
+        System.out.println(exp.mean());
+        System.out.println(exp.variance());
+        System.out.println(exp.coefficientOfVariation());
+    }
 }

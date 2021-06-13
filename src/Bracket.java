@@ -55,4 +55,14 @@ public class Bracket
     {
         return upper;
     }
+
+    public static void main(String[] args) {
+        DoubleUnaryOperator fn = (x) -> {
+          return Math.sin(x) * Math.pow(Math.cos(x), 2);
+        };
+        Bracket bracket = new Bracket(fn);
+        System.out.println(bracket.isBracketing());
+        System.out.println(bracket.lower().getAsDouble());
+        System.out.println(bracket.upper().getAsDouble());
+    }
 }
