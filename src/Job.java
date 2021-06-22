@@ -98,7 +98,7 @@ public class Job {
 
     public boolean isFinished()
     {
-        return status <= 0.0;
+        return Misc.compareDouble(status, 0.0);
     }
 
     public double arrival()
