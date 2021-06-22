@@ -2,6 +2,7 @@ package spool;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.DoubleUnaryOperator;
 import java.util.OptionalDouble;
@@ -16,6 +17,22 @@ public class SITA extends Dispatcher
     {
         this.receiver = receiver;
         this.interval = interval;
+    }
+
+    public static Supplier<Dispatcher> getPrototype(
+            List<Supplier<Receiver>> supplierList, Distribution service)
+    {
+        Supplier<Dispatcher> supplier = () -> {
+            double [] interval = SITA.split(supplierList.size(), service);
+            Receiver[] receiver = new Receiver[supplierList.size()];
+            for (int i = 0; i < supplierList.size(); i++)
+            {
+                receiver[i] = supplierList.get(i).get();
+            }
+            return new SITA(receiver, interval);
+        };
+
+        return supplier;
     }
 
     public void dispatch(Job incoming)

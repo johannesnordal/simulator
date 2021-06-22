@@ -45,6 +45,6 @@ public abstract class Distribution
 
     public double coefficientOfVariation()
     {
-        return Math.sqrt(variance()/mean());
+        return Math.sqrt(variance())/mean();
     }
 }

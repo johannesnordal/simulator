@@ -1,5 +1,7 @@
 package spool;
 
+import java.util.List;
+import java.util.ArrayList;
 import static java.lang.Math.pow;
 
 public class Stats
@@ -125,5 +127,66 @@ public class Stats
         }
 
         return new Stats(moment, arrivals, departures);
+    }
+
+    public static Stats merge(Stats[] ...collection)
+    {
+        List<Stats> list = new ArrayList<>();
+
+        for (int i = 0; i < collection.length; i++)
+        {
+            for (int j = 0; j < collection[i].length; j++)
+            {
+                list.add(collection[i][j]);
+            }
+        }
+
+        Stats[] stats = list.toArray(new Stats[list.size()]);
+
+        return merge(stats);
+    }
+
+    public static Stats.Builder[] getBuilders(int n)
+    {
+        Stats.Builder[] builder = new Stats.Builder[n];
+
+        for (int i = 0; i < n; i++)
+            builder[i] = new Stats.Builder();
+
+        return builder;
+    }
+
+    public static Stats[] build(Stats.Builder[] builder)
+    {
+        Stats[] stats = new Stats[builder.length];
+
+        for (int i = 0; i < stats.length; i++) 
+        {
+            stats[i] = builder[i].build();
+        }
+
+        return stats;
+    }
+
+    public static Stats[] build(Stats.Builder[] ...collection)
+    {
+        List<Stats.Builder> list = new ArrayList<>();
+
+        for (int i = 0; i < collection.length; i++)
+        {
+            for (int j = 0; j < collection[i].length; j++)
+            {
+                list.add(collection[i][j]);
+            }
+        }
+
+        Stats.Builder[] builder = list.toArray(new Stats.Builder[list.size()]);
+
+        return build(builder);
+    }
+
+    public static Stats get(Stats.Builder[] ...collection)
+    {
+        return merge(build(collection));
     }
 }

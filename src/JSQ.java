@@ -9,7 +9,17 @@ public class JSQ extends Dispatcher
     private Scheduler[] scheduler;
     private Random random;
 
-    private JSQ(Scheduler[] scheduler)
+    public JSQ(Supplier<Scheduler> supplier, int n)
+    {
+        scheduler = new Scheduler[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            scheduler[i] = supplier.get();
+        }
+    }
+
+    public JSQ(Scheduler[] scheduler)
     {
         this.scheduler = scheduler;
         random = new Random();

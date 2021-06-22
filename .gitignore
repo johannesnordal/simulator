@@ -1,12 +1,10 @@
-# /
+# globally
+*.swp
 *.class
 *.jar
-*.java
-*.swp
+
+# root
 bin
 dist
 scratch
-
-# /src
-src/*.class
-src/*.swp
+/*.java

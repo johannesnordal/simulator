@@ -2,8 +2,9 @@ package spool;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
-public abstract class Scheduler implements EventSource, Receiver
+public abstract class Scheduler implements Receiver, Simulator
 {
     private List<Observer> observers = new ArrayList<>();
 
@@ -30,4 +31,26 @@ public abstract class Scheduler implements EventSource, Receiver
             x.update(event, job);
         }
     }
+
+    public Stats simulate(Distribution arrival,
+                          Distribution service,
+                          int numberOfJobs)
+    {
+        Stats.Builder builder = new Stats.Builder();
+        this.registerObserver(builder);
+        Job.streamOf(arrival, service, numberOfJobs).forEach(this::receive);
+        return builder.build();
+    }
+
+    public <T extends Observer> T simulate(Supplier<T> supplier,
+                                           Distribution arrival,
+                                           Distribution service,
+                                           int numberOfJobs)
+    {
+        T observer = supplier.get();
+        this.registerObserver(observer);
+        Job.streamOf(arrival, service, numberOfJobs).forEach(this::receive);
+        return observer;
+    }
+
 }

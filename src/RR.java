@@ -7,6 +7,16 @@ public class RR extends Dispatcher
     private Receiver[] receiver;
     private int i = 0;
 
+    public RR(Supplier<Receiver> supplier, int n)
+    {
+        receiver = new Receiver[n];
+
+        for (int j = 0; j < n; j++)
+        {
+            receiver[j] = supplier.get();
+        }
+    }
+
     public RR(Receiver[] receiver)
     {
         this.receiver = receiver;
