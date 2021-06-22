@@ -134,26 +134,21 @@ public class Job {
             .toString();
     }
 
-    public static double waiting(Job x)
+    public double waiting()
     {
-        double w = response(x) - x.service();
+        double w = this.response() - this.service;
 
-        if (w < 0.0)
-        {
-            return 0.0;
-        }
-
-        return w;
+        return w >= 0.0 ? w : 0.0;
     }
 
-    public static double response(Job x)
+    public double response()
     {
-        return x.step() - x.arrival();
+        return this.step - this.arrival;
     }
 
-    public static double slowdown(Job x)
+    public double slowdown()
     {
-        return response(x) / x.service();
+        return this.response() / this.service;
     }
 
     public static Comparator<Job> comparator(ToDoubleFunction<Job> fn)

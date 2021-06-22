@@ -32,12 +32,12 @@ public class Stats
             {
                 moment[1][0] += job.service();
                 moment[1][1] += pow(job.service(), 2);
-                moment[2][0] += Job.waiting(job);
-                moment[2][1] += pow(Job.waiting(job), 2);
-                moment[3][0] += Job.response(job);
-                moment[3][1] += pow(Job.response(job), 2);
-                moment[4][0] += Job.slowdown(job);
-                moment[4][1] += pow(Job.slowdown(job), 2);
+                moment[2][0] += job.waiting();
+                moment[2][1] += pow(job.waiting(), 2);
+                moment[3][0] += job.response();
+                moment[3][1] += pow(job.response(), 2);
+                moment[4][0] += job.slowdown();
+                moment[4][1] += pow(job.slowdown(), 2);
                 departures++;
             }
         }
