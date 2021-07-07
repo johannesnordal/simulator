@@ -25,7 +25,7 @@ public class PS extends Scheduler
     }
 
     // This method checks if the job with the lowest remaining service
-    // departs before the next step. It does so simply by servicing the job
+    // departs before the next step. It does so simply by processing the job
     // and either returning the time of departure or, in case it doesn't
     // depart before the next step, positive infinity.
     private double checkForDeparturesBeforeNextStep(double nextStep)
